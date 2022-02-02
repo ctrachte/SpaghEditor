@@ -1,6 +1,6 @@
 # SpaghEditor
 <p align="center">
-![SpaghEditor](logo.png)
+<img src="logo.png" alt="SpaghEditor">
 </p>
 
 Content Mgmt, based on the idea of JSON to Markdown to HTML
