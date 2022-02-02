@@ -6,7 +6,7 @@ class TheChef {
     constructor (props) {
         this.raw = props.raw,
         this.json = props.json,
-        this.text = props.text,
+        this.noodles = props.text,
         this.html = props.html,
         this.markdown = props.markdown,
         this.markdownScore = this.markdownScore.bind(this),
@@ -14,7 +14,7 @@ class TheChef {
     }
     //parent method to determine type
     WhatTypeIsThe (raw) {
-        this.string = toString(raw);
+        this.noodles = toString(raw);
         RegExpScore.htmlRegEx = new RegExp(/<\/?[a-z][\s\S]*>/i);
         this.type = {
             'html': htmlRegEx.test(this.raw),
@@ -29,5 +29,6 @@ class TheChef {
         RegExpScore.matchBold = /\*\*.*\*\*/gm.test(raw);
         RegExpScore.matchItalic = /\*.*\*/gm.test(raw);
         RegExpScore.matchLink = /\[(.+)\]\(([^ ]+?)( "(.+)")?\)/gm.test(raw);
+        console.log(this.RegExpScore)
     }
 }
