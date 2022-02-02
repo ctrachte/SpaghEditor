@@ -26,16 +26,19 @@ export default class TheChef {
         };
     }
     // creates a scoring system to weight the chances that the string is a markdown string
+    // TODO: Check for tabs, spaces, and replace
+    // TODO: return values from each of these RegExp (Strainer)
     markdownScore(raw) {
         let RegExpScore = new Object();
-        RegExpScore.matchHeading1 = /^#{1}[^#].*/gm.test(raw) ? 5 : 0; // very low score
-        RegExpScore.matchHeading3 = /^#{2}[^#].*/gm.test(raw) ? 10 : 0; // low score
-        RegExpScore.matchHeading3 = /^#{3}[^#].*/gm.test(raw) ? 15 : 0; // medium score
-        RegExpScore.matchHeading4 = /^#{4}[^#].*/gm.test(raw) ? 15 : 0; // medium score
-        RegExpScore.matchHeading5 = /^#{5}[^#].*/gm.test(raw) ? 20 : 0; // high score
-        RegExpScore.matchHeading6 = /^#{6}[^#].*/gm.test(raw) ? 30 : 0; // very high score
+        RegExpScore.matchHeading1 = /^#{1}[? ]/gm.test(raw) ? 5 : 0; // very low score
+        RegExpScore.matchHeading2 = /^#{2}[? ]/gm.test(raw) ? 10 : 0; // low score
+        RegExpScore.matchHeading3 = /^#{3}[? ]/gm.test(raw) ? 15 : 0; // medium score
+        RegExpScore.matchHeading4 = /^#{4}[? ]/gm.test(raw) ? 15 : 0; // medium score
+        RegExpScore.matchHeading5 = /^#{5}[? ]/gm.test(raw) ? 20 : 0; // high score
+        RegExpScore.matchHeading6 = /^#{6}[? ]/gm.test(raw) ? 30 : 0; // very high score
         // RegExpScore.matchBold = /^(*{2}|_{2}){1}(.+)+\1$/gm.test(raw); // medium score
         RegExpScore.matchItalic = /\*.*\*/gm.test(raw) ? 5 : 0; // low score
+        RegExpScore.matchBold = /\*\*.*\*\*\*/gm.test(raw) ? 10 : 0; // low score
         RegExpScore.matchLink = /\[(.+)\]\(([^ ]+?)( "(.+)")?\)/gm.test(raw) ? 50 : 0; // very high score
         RegExpScore.total = 0;
         // total score:
