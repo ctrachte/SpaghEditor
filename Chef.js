@@ -13,7 +13,7 @@ class TheChef {
         this.WhatTypeIsThe = this.WhatTypeIsThe.bind(this)
     }
     //parent method to determine type
-    WhatTypeIsThe (raw) {
+    WhatTypeIsThe(raw) {
         this.noodles = toString(raw);
         RegExpScore.htmlRegEx = new RegExp(/<\/?[a-z][\s\S]*>/i);
         this.type = {
@@ -25,10 +25,15 @@ class TheChef {
     // creates a scoring system to weight the chances that the string is a markdown string
     markdownScore(raw) {
         this.RegExpScore = new Object();
-        RegExpScore.matchHeading = /# [a-z]/gm.test(raw);
-        RegExpScore.matchBold = /\*\*.*\*\*/gm.test(raw);
-        RegExpScore.matchItalic = /\*.*\*/gm.test(raw);
-        RegExpScore.matchLink = /\[(.+)\]\(([^ ]+?)( "(.+)")?\)/gm.test(raw);
+        RegExpScore.matchHeading1 = /^#{2}[^#].*/gm.test(raw); // very low score
+        RegExpScore.matchHeading2 = /^#{2}[^#].*/gm.test(raw); // low score
+        RegExpScore.matchHeading3 = /^#{3}[^#].*/gm.test(raw); // medium score
+        RegExpScore.matchHeading4 = /^#{4}[^#].*/gm.test(raw); // medium score
+        RegExpScore.matchHeading5 = /^#{5}[^#].*/gm.test(raw); // high score
+        RegExpScore.matchHeading6 = /^#{6}[^#].*/gm.test(raw); // very high score
+        RegExpScore.matchBold = /^(*{2}|_{2}){1}(.+)+\1$/gm.test(raw); // medium score
+        RegExpScore.matchItalic = /\*.*\*/gm.test(raw); // low score
+        RegExpScore.matchLink = /\[(.+)\]\(([^ ]+?)( "(.+)")?\)/gm.test(raw); // high score
         console.log(this.RegExpScore)
     }
 }
