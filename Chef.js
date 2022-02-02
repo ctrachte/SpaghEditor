@@ -9,8 +9,10 @@ export default class TheChef {
         this.noodles = props.text,
         this.html = props.html,
         this.markdown = props.markdown,
+        this.devMode = true, // true if you want to see values logged
         this.markdownScore = this.markdownScore.bind(this),
         this.WhatTypeIsThe = this.WhatTypeIsThe.bind(this),
+        console.log(this.raw)
         this.markdownScore(this.raw)
     }
     //parent method to determine type
@@ -26,8 +28,8 @@ export default class TheChef {
     // creates a scoring system to weight the chances that the string is a markdown string
     markdownScore(raw) {
         let RegExpScore = new Object();
-        RegExpScore.matchHeading1 = /^#{2}[^#].*/gm.test(raw) ? 5 : 0; // very low score
-        RegExpScore.matchHeading2 = /^#{2}[^#].*/gm.test(raw) ? 10 : 0; // low score
+        RegExpScore.matchHeading1 = /^#{1}[^#].*/gm.test(raw) ? 5 : 0; // very low score
+        RegExpScore.matchHeading3 = /^#{2}[^#].*/gm.test(raw) ? 10 : 0; // low score
         RegExpScore.matchHeading3 = /^#{3}[^#].*/gm.test(raw) ? 15 : 0; // medium score
         RegExpScore.matchHeading4 = /^#{4}[^#].*/gm.test(raw) ? 15 : 0; // medium score
         RegExpScore.matchHeading5 = /^#{5}[^#].*/gm.test(raw) ? 20 : 0; // high score
@@ -35,6 +37,14 @@ export default class TheChef {
         // RegExpScore.matchBold = /^(*{2}|_{2}){1}(.+)+\1$/gm.test(raw); // medium score
         RegExpScore.matchItalic = /\*.*\*/gm.test(raw) ? 5 : 0; // low score
         RegExpScore.matchLink = /\[(.+)\]\(([^ ]+?)( "(.+)")?\)/gm.test(raw) ? 50 : 0; // very high score
-        console.log(RegExpScore)
+        RegExpScore.total = 0;
+        // total score:
+        Object.values(RegExpScore).forEach(score => {
+            RegExpScore.total += score;
+          });
+        if (this.devMode)
+        {
+            console.log('Markdown RegEx Score: ', RegExpScore)
+        }
     }
 }
