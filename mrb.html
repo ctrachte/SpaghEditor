@@ -6,9 +6,37 @@
 </head>
 <body>
 <h3>Spagheditor - Throw everything at the wall and see what sticks</h3>
+<p>
+    The master behind the scenes is the chef
+    Strings are noodles
+</p>
     
-<div class="editorel" contenteditable="true" style="width: 100%; height: 600px; max-height: 600px; overflow-y: scroll;">
+<div class="editorel" contenteditable="true">
 </div>
+
+<style>
+    html, body
+    {
+        height: 100%;
+        width: 100%;
+        max-width: calc(100vw);
+        margin: 0;
+        padding: 0;
+    }
+    body
+    {
+        padding: .5rem;
+    }
+    .editorel
+    {
+        padding: 1rem; 
+        width: 90%; 
+        height: 600px; 
+        max-height: 600px; 
+        overflow-y: scroll; 
+        border: 1px solid #969696;
+    }
+</style>
 
 <!-- <textarea></textarea> -->
 
@@ -22,6 +50,11 @@
     processel.addEventListener('click', function()
     {
         parseText();
+    });
+
+    editorel.addEventListener('click', function()
+    {
+        editorel.focus();
     });
 
     let testText = `The Egg
@@ -164,18 +197,28 @@ You thought for a long time.
 
 And I sent you on your way.`;
 
+
+
     editorel.innerText = testText;
 
     function parseText()
     {
         //console.log(editorel.innerHTML);
 
+        //Pasting from MS Word
+        //class="MsoNormal"
+
+        //Parse by line
         let linesArr = editorel.innerHTML.split(/\r\n|\n|<br*\>/);
         let linesObjArr = [];
-
         for(let x = 0; x < linesArr.length; x++)
         {
             //console.log(linesArr[x]);
+            let line = linesArr[x];
+
+            let newLine = [];
+            //newLine.elements.push()
+            let newElement = new clsElement();
 
             let newdocElement = new docElement();
             newdocElement.text = JSON.stringify(linesArr[x]);
@@ -197,16 +240,23 @@ And I sent you on your way.`;
         //editorel.value = JSON.stringify(linesObjArr);
     }
 
-    
+    function createElementFromHTMLString(htmlString) 
+    {
+        let nodeEl = new DOMParser().parseFromString(htmlString, 'text/html').body.childNodes;
+        return nodeEl;
+    }
 
+    function GetChildren(el)
+    {
+
+    }
     
-    class docElement
+    class clsElement
     {
         constructor()
         {
             this.format = '';
             this.text = '';
-            this.sub = [];
         }
     }
 
