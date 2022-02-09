@@ -3,9 +3,40 @@
 <img src="logo.png" alt="SpaghEditor">
 </p>
 
+## What is this?
+
 Content Mgmt, based on the idea of JSON to Markdown to HTML
 
 A method to convert JSON to HTML or Markdown, and vice-versa.
+
+** Here's the scribbles we made for ideas and design goals: ** 
+### Rough Notes
+
+*JSON based editor*
+
+#### One object per line
+	Sub objects for formatting in line
+	Order of subs dictates order of words/chars
+
+#### Image
+- Formatting 
+
+#### Processing:
+- Get text by line
+- interpret format
+ - Parse html
+ - Store data
+ - Output to 64bit encoded string
+ - Output to Markdown or HTML
+ - 
+**Nice to have:**
+- Encryption of data or parts of data
+- 
+#### IMPORTANT: 
+- Spaghetti Themed methods, variables, and class names.
+
+#### Potential Uses
+- Service to take json string and return formatted elements to remove need for backend server To canvas output for multiple applications
 
 <!-- CONTRIBUTING -->
 ## Contributing
