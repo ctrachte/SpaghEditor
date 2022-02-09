@@ -18,8 +18,7 @@ export default class TheChef {
     // seperate lines and evaluate
     this.noodles = this.makeNoodles(this.raw);
     // determine type
-    this.whatKindOfNoodles(this.noodles);
-
+    this.whatKindOfNoodles();
     // TODO: need a method to parse for each type
     this.noodles.forEach((noodle) => {
       if (noodle.type.html) {
@@ -43,8 +42,8 @@ export default class TheChef {
     }
   }
   //parent method to determine type of each line/noodle
-  whatKindOfNoodles(raw) {
-    this.noodles = this.noodles.map((noodle) => {
+  whatKindOfNoodles() {
+    this.noodles = this.noodles.map(function (noodle) {
       let value = noodle;
       noodle = new Object();
       noodle.value = value;
@@ -54,10 +53,7 @@ export default class TheChef {
         json: this.isJson(noodle.value),
       };
       return noodle;
-    });
-    if (this.devMode) {
-      console.table(this.noodles);
-    }
+    }.bind(this));
   }
   // scoring system to weight the chances that the string is a markdown string
   // TODO: Check for tabs, spaces, and replace
@@ -81,9 +77,6 @@ export default class TheChef {
     Object.values(RegExpScore).forEach((score) => {
       RegExpScore.total += score;
     });
-    if (this.devMode) {
-      console.log("Markdown RegEx Score: ", RegExpScore);
-    }
     return RegExpScore;
   }
   // test raw string to see if it should be evaluated as HTML
