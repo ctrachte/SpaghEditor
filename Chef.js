@@ -3,14 +3,14 @@
 export default class TheChef {
   constructor(props) {
     (this.raw = props.raw),
-      (this.json = props.json),
-      (this.noodles = props.text),
-      (this.html = props.html),
-      (this.markdown = props.markdown),
-      (this.devMode = true), // true if you want to see values logged
-      (this.markdownScore = this.markdownScore.bind(this)),
-      (this.WhatTypeIsThe = this.WhatTypeIsThe.bind(this)),
-      (this.brain = this.brain.bind(this));
+    (this.json = props.json),
+    (this.noodles = props.text),
+    (this.html = props.html),
+    (this.markdown = props.markdown),
+    (this.devMode = true), // true if you want to see values logged
+    (this.markdownScore = this.markdownScore.bind(this)),
+    (this.WhatTypeIsThe = this.WhatTypeIsThe.bind(this)),
+    (this.brain = this.brain.bind(this));
     this.brain();
   }
   brain() {
