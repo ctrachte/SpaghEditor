@@ -13,9 +13,9 @@ A method to convert JSON to HTML or Markdown, and vice-versa.
 
 *JSON based editor*
 
-#### One object per line
-	Sub objects for formatting in line
-	Order of subs dictates order of words/chars
+#### One element/object returned from main "Chef" class, per line of text (translated from raw text block)  ... eg. "noodles"
+- Sub objects for formatting in line
+- Order of subs dictates order of words/chars
 
 #### Image
 - Formatting 
