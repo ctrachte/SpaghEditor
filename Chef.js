@@ -3,68 +3,77 @@
 export default class TheChef {
   constructor(props) {
     (this.raw = props.raw),
-    (this.json = props.json),
-    (this.noodles = props.text),
-    (this.html = props.html),
-    (this.markdown = props.markdown),
-    (this.devMode = true), // true if you want to see values logged
-    (this.markdownScore = this.markdownScore.bind(this)),
-    (this.WhatTypeIsThe = this.WhatTypeIsThe.bind(this)),
-    (this.brain = this.brain.bind(this));
+      (this.json = props.json),
+      (this.noodles = props.text),
+      (this.html = props.html),
+      (this.markdown = props.markdown),
+      (this.devMode = true), // true if you want to see values logged
+      (this.markdownScore = this.markdownScore.bind(this)),
+      (this.whatKindOfNoodles = this.whatKindOfNoodles.bind(this)),
+      (this.brain = this.brain.bind(this));
     this.brain();
   }
+  // equivalent of 'main' method
   brain() {
-    // determine type
-    this.WhatTypeIsThe(this.raw);
     // seperate lines and evaluate
-    // this.noodles = this.seperateLines(this.raw);
-    // this.dish = this.parseText(this.noodles);
+    this.noodles = this.makeNoodles(this.raw);
+    // determine type
+    this.whatKindOfNoodles(this.noodles);
+
+    // TODO: need a method to parse for each type
+    this.noodles.forEach((noodle) => {
+      if (noodle.type.html) {
+        // parse html to json structure
+      } else if (noodle.type.json) {
+        // convert to either html, markdown depending on user input.
+      } else if (noodle.type.markdownScore > 0) {
+        // parse markdown to json structure
+      } else {
+        noodle.type.string = true;
+        console.warn(
+          "unable to determine raw ingredients, I dont know how to make your pasta!"
+        );
+        // make best guess of formatting and return json structure
+        // this.parseText(this.raw);
+      }
+    });
+    // log values for devmode
     if (this.devMode) {
-      console.table([
-        { "type scoring: ": this.type },
-        { "dish: ": this.dish },
-        { "noodles: ": this.noodles },
-      ]);
-    }
-    // for loop here
-    if (this.type.html) {
-      // parse html to json structure
-    } else if (this.type.json) {
-      // convert to either html, markdown depending on user input.
-    } else if (this.type.markdownScore > 0) {
-      // parse markdown to json structure
-    } else {
-      console.warn(
-        "unable to determine raw ingredients, I dont know how to make your pasta!"
-      );
-      // make best guess of formatting and return json structure
-      this.parseText(this.raw);
+      console.table(this.noodles);
     }
   }
-  //parent method to determine type
-  WhatTypeIsThe(raw) {
-    this.noodles = toString(raw);
-    this.type = {
-      html: this.htmlScore(this.raw),
-      markdownScore: this.markdownScore(this.raw),
-      json: this.isJson(this.raw),
-    };
+  //parent method to determine type of each line/noodle
+  whatKindOfNoodles(raw) {
+    this.noodles = this.noodles.map((noodle) => {
+      let value = noodle;
+      noodle = new Object();
+      noodle.value = value;
+      noodle.type = {
+        html: this.htmlScore(noodle.value),
+        markdownScore: this.markdownScore(noodle.value),
+        json: this.isJson(noodle.value),
+      };
+      return noodle;
+    });
+    if (this.devMode) {
+      console.table(this.noodles);
+    }
   }
   // scoring system to weight the chances that the string is a markdown string
   // TODO: Check for tabs, spaces, and replace
   // TODO: return values from each of these RegExp (Strainer)
   markdownScore(raw) {
     let RegExpScore = new Object();
-    RegExpScore.matchHeading1 = /^#{1}[? ]/gm.test(raw) ? 5 : 0; // very low score
-    RegExpScore.matchHeading2 = /^#{2}[? ]/gm.test(raw) ? 10 : 0; // low score
-    RegExpScore.matchHeading3 = /^#{3}[? ]/gm.test(raw) ? 15 : 0; // medium score
-    RegExpScore.matchHeading4 = /^#{4}[? ]/gm.test(raw) ? 15 : 0; // medium score
-    RegExpScore.matchHeading5 = /^#{5}[? ]/gm.test(raw) ? 20 : 0; // high score
-    RegExpScore.matchHeading6 = /^#{6}[? ]/gm.test(raw) ? 30 : 0; // very high score
-    // RegExpScore.matchBold = /^(*{2}|_{2}){1}(.+)+\1$/gm.test(raw); // medium score
-    RegExpScore.matchItalic = /\*.*\*/gm.test(raw) ? 5 : 0; // low score
-    RegExpScore.matchBold = /\*\*.*\*\*\*/gm.test(raw) ? 10 : 0; // low score
-    RegExpScore.matchLink = /\[(.+)\]\(([^ ]+?)( "(.+)")?\)/gm.test(raw)
+    RegExpScore.matchHeading1 = /^#{1}[? ]/.test(raw) ? 5 : 0; // very low score
+    RegExpScore.matchHeading2 = /^#{2}[? ]/.test(raw) ? 10 : 0; // low score
+    RegExpScore.matchHeading3 = /^#{3}[? ]/.test(raw) ? 15 : 0; // medium score
+    RegExpScore.matchHeading4 = /^#{4}[? ]/.test(raw) ? 15 : 0; // medium score
+    RegExpScore.matchHeading5 = /^#{5}[? ]/.test(raw) ? 20 : 0; // high score
+    RegExpScore.matchHeading6 = /^#{6}[? ]/.test(raw) ? 30 : 0; // very high score
+    // RegExpScore.matchBold = /^(*{2}|_{2}){1}(.+)+\1$/.test(raw); // medium score
+    RegExpScore.matchItalic = /\*.*\*/.test(raw) ? 5 : 0; // low score
+    RegExpScore.matchBold = /\*\*.*\*\*\*/.test(raw) ? 10 : 0; // low score
+    RegExpScore.matchLink = /\[(.+)\]\(([^ ]+?)( "(.+)")?\)/.test(raw)
       ? 50
       : 0; // very high score
     RegExpScore.total = 0;
@@ -93,7 +102,7 @@ export default class TheChef {
     }
     return true;
   }
-  seperateLines(text) {
+  makeNoodles(text) {
     return text.split("\n");
   }
   parseText(textLinesArray) {
