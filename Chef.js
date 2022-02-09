@@ -10,23 +10,47 @@ export default class TheChef {
       (this.devMode = true), // true if you want to see values logged
       (this.markdownScore = this.markdownScore.bind(this)),
       (this.WhatTypeIsThe = this.WhatTypeIsThe.bind(this)),
-      console.log(this.raw);
-    this.markdownScore(this.raw);
-    this.noodles = this.seperateLines(this.raw);
-    this.dish = this.parseText(this.noodles)
-    console.log(this.dish);
+      (this.brain = this.brain.bind(this));
+    this.brain();
+  }
+  brain() {
+    // determine type
+    this.WhatTypeIsThe(this.raw);
+    // seperate lines and evaluate
+    // this.noodles = this.seperateLines(this.raw);
+    // this.dish = this.parseText(this.noodles);
+    if (this.devMode) {
+      console.table([
+        { "type scoring: ": this.type },
+        { "dish: ": this.dish },
+        { "noodles: ": this.noodles },
+      ]);
+    }
+    // for loop here
+    if (this.type.html) {
+      // parse html to json structure
+    } else if (this.type.json) {
+      // convert to either html, markdown depending on user input.
+    } else if (this.type.markdownScore > 0) {
+      // parse markdown to json structure
+    } else {
+      console.warn(
+        "unable to determine raw ingredients, I dont know how to make your pasta!"
+      );
+      // make best guess of formatting and return json structure
+      this.parseText(this.raw);
+    }
   }
   //parent method to determine type
   WhatTypeIsThe(raw) {
     this.noodles = toString(raw);
-    RegExpScore.htmlRegEx = new RegExp(/<\/?[a-z][\s\S]*>/i);
     this.type = {
-      html: htmlRegEx.test(this.raw),
-      markdownScore: markdownScore(this.raw),
-      json: isJson(this.raw),
+      html: this.htmlScore(this.raw),
+      markdownScore: this.markdownScore(this.raw),
+      json: this.isJson(this.raw),
     };
   }
-  // creates a scoring system to weight the chances that the string is a markdown string
+  // scoring system to weight the chances that the string is a markdown string
   // TODO: Check for tabs, spaces, and replace
   // TODO: return values from each of these RegExp (Strainer)
   markdownScore(raw) {
@@ -51,13 +75,28 @@ export default class TheChef {
     if (this.devMode) {
       console.log("Markdown RegEx Score: ", RegExpScore);
     }
+    return RegExpScore;
+  }
+  // test raw string to see if it should be evaluated as HTML
+  htmlScore(raw) {
+    let RegExpScore =
+      /<(?=.*? .*?\/ ?>|br|hr|input|!--|wbr)[a-z]+.*?>|<([a-z]+).*?<\/\1>/i.test(
+        raw
+      );
+    return RegExpScore;
+  }
+  isJson(str) {
+    try {
+      JSON.parse(str);
+    } catch (e) {
+      return false;
+    }
+    return true;
   }
   seperateLines(text) {
     return text.split("\n");
   }
-
   parseText(textLinesArray) {
-
     //Pasting from MS Word
     //class="MsoNormal"
 
@@ -65,12 +104,10 @@ export default class TheChef {
     let linesObjArr = [];
     for (let x = 0; x < textLinesArray.length; x++) {
       let line = textLinesArray[x];
-
       let newLine = [];
       //newLine.elements.push()
       let newElement = new clsElement();
       newElement.text = JSON.stringify(textLinesArray[x]);
-
       linesObjArr.push(newElement);
     }
     return linesObjArr;
@@ -86,14 +123,12 @@ export default class TheChef {
     //editorel.value = JSON.stringify(linesObjArr);
   }
 }
-class clsElement
-{
-    constructor()
-    {
-        this.elementType = 'div';
-        this.format = '';
-        this.text = '';
-        // this.htmlElement = document.createElement(this.elementType);
-        // this.htmlElement.innerHTML = this.text;
-    }
+class clsElement {
+  constructor() {
+    this.elementType = "div";
+    this.format = "";
+    this.text = "";
+    // this.htmlElement = document.createElement(this.elementType);
+    // this.htmlElement.innerHTML = this.text;
+  }
 }
