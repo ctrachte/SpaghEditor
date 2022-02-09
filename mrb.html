@@ -7,12 +7,20 @@
 <body>
 <h3>Spagheditor - Throw everything at the wall and see what sticks</h3>
 <p>
-    The master behind the scenes is the chef
-    Strings are noodles
+    The master behind the scenes is the chef <br />
+    Strings are noodles <br />
+    Stored data is pasta <br />
+    Outputs are plates <br />
+
+    Plugins - Named after pasta dishes
 </p>
-    
+
+<!--Author View-->
 <div class="editorel" contenteditable="true">
 </div>
+<button class="processel">Process</button>
+<!--Code View-->
+<textarea cols="6" rows="6" style="width: 50%; height: 300px;"></textarea>
 
 <style>
     html, body
@@ -38,19 +46,10 @@
     }
 </style>
 
-<!-- <textarea></textarea> -->
-
-<button class="processel">Process</button>
-
 <script>
     let editorel = document.querySelector('.editorel');
 
-    let processel = document.querySelector('.processel');
-
-    processel.addEventListener('click', function()
-    {
-        parseText();
-    });
+    let processel = document.querySelector('.processel'); //Button
 
     editorel.addEventListener('click', function()
     {
@@ -58,10 +57,19 @@
     });
 
     let testText = `The Egg
-
+# SpaghEditor
+## SpaghEditor
+### SpaghEditor
+#### d
+##### dd
+###### d
 By: Andy Weir
 
- 
+dsfa<br>dfsfads
+dfdsf<br />fdsfds
+dsfdsf<br / >fdsfads
+
+The quick brown <p>fox jumps over</p> the lazy dog
 
 You were on your way home when you died.
 
@@ -196,69 +204,169 @@ You thought for a long time.
 “An egg.” I answered. “Now it’s time for you to move on to your next life.”
 
 And I sent you on your way.`;
-
-
-
     editorel.innerText = testText;
 
-    function parseText()
+    document.querySelector('textarea').value = `
+
+## License
+
+Licensed under the [MIT License](https://opensource.org/licenses/MIT).
+    
+    `;
+
+    class noodleMaker
     {
-        //console.log(editorel.innerHTML);
-
-        //Pasting from MS Word
-        //class="MsoNormal"
-
-        //Parse by line
-        let linesArr = editorel.innerHTML.split(/\r\n|\n|<br*\>/);
-        let linesObjArr = [];
-        for(let x = 0; x < linesArr.length; x++)
+        constructor(options)
         {
-            //console.log(linesArr[x]);
-            let line = linesArr[x];
+            this.options = options;
+            //this.options.editorElement
 
-            let newLine = [];
-            //newLine.elements.push()
-            let newElement = new clsElement();
-
-            let newdocElement = new docElement();
-            newdocElement.text = JSON.stringify(linesArr[x]);
-
-            linesObjArr.push(newdocElement);
+            this.pasta = [];
         }
 
-        console.log(JSON.stringify(linesObjArr));
-        //console.log(linesObjArr);
+        //Get lines of text from text/html/markdown
+        noodles()
+        {
+            let flour = this.options.editorElement.innerHTML;
 
-        //editorel.value = '';
+            //H1-6, P tags are new lines but we only need to preserve the opening tag so the closing tag is treated as a linebreak
+            flour = flour.replace(/(<\/p>)|(<\/ p>)|(< \/ p>)|(< \/p>)|(<\/h1>)|(<\/ h1>)|(< \/ h1>)|(< \/h1>)|(<\/h2>)|(<\/ h2>)|(< \/ h2>)|(< \/h2>)|(<\/h3>)|(<\/ h3>)|(< \/ h3>)|(< \/h3>)|(<\/h4>)|(<\/ h4>)|(< \/ h4>)|(< \/h4>)|(<\/h5>)|(<\/ h5>)|(< \/ h5>)|(< \/h5>)|(<\/h6>)|(<\/ h6>)|(< \/ h6>)|(< \/h6>)/gm, '<br />'); //closing paragraph tags
+            flour = flour.replace(/(# .*)|(## .*)|(### .*)|(#### .*)|(##### .*)|(###### .*)/gm, '$1<br />'); //Linebreaks for markdown headers
+            //flour = flour.replace(/(\r\n)|(\n)|(<br \/>)/gm, '<br>'); //Consistent linebreaks
+            flour = flour.replace(/(<br \/>)/gm, '<br>'); //Consistent linebreaks
+            flour = flour.replace(/(<!--.+?-->)/gm, '');
+            
+            let dough = flour.split('<br>'); //split on linebreaks
 
-        // linesObjArr.forEach((line) =>
-        // {
-        //     console.log(line);
-        //     //editorel.value += line + '\n';
-        // });
+            this.pasta = []; //86 the pasta aka throw out the old pasta
 
-        //editorel.value = JSON.stringify(linesObjArr);
+            //Work the dough
+            for(let x = 0; x < dough.length; x++)
+            {
+                if(typeof dough[x] !== 'undefined' && dough[x] !== null && (dough[x] === '' || dough[x].length > 0))
+                {
+                    let noodle = new clsNoodle();
+                    noodle.value = JSON.stringify(dough[x]);
+                    this.pasta.push(noodle);
+                    console.log(dough[x])
+                }
+            }
+
+            //this.boiler(); //Boil them noodles
+        }
+
+        //Parse out lines, types, attributes
+        boiler()
+        {
+            this.pasta.forEach(noodle => 
+            {
+                let str = noodle.value;
+
+                if(str.match(/(<p.+?>)/gm))
+                {
+                    noodle.format = str.match(/(<p.+?>)/gm);
+                    noodle.value = str.replace(/(<p.+?>)/gm, '');
+                }
+                if(str.match(/(<\/h1>)|(<\/ h1>)|(< \/ h1>)|(< \/h1>)|(<\/h2>)|(<\/ h2>)|(< \/ h2>)|(< \/h2>)|(<\/h3>)|(<\/ h3>)|(< \/ h3>)|(< \/h3>)|(<\/h4>)|(<\/ h4>)|(< \/ h4>)|(< \/h4>)|(<\/h5>)|(<\/ h5>)|(< \/ h5>)|(< \/h5>)|(<\/h6>)|(<\/ h6>)|(< \/ h6>)|(< \/h6>)/gm))
+                {
+                    noodle.format = str.match(/(<\/h1>)|(<\/ h1>)|(< \/ h1>)|(< \/h1>)|(<\/h2>)|(<\/ h2>)|(< \/ h2>)|(< \/h2>)|(<\/h3>)|(<\/ h3>)|(< \/ h3>)|(< \/h3>)|(<\/h4>)|(<\/ h4>)|(< \/ h4>)|(< \/h4>)|(<\/h5>)|(<\/ h5>)|(< \/ h5>)|(< \/h5>)|(<\/h6>)|(<\/ h6>)|(< \/ h6>)|(< \/h6>)/gm);
+                    noodle.value = str.replace(/(<\/h1>)|(<\/ h1>)|(< \/ h1>)|(< \/h1>)|(<\/h2>)|(<\/ h2>)|(< \/ h2>)|(< \/h2>)|(<\/h3>)|(<\/ h3>)|(< \/ h3>)|(< \/h3>)|(<\/h4>)|(<\/ h4>)|(< \/ h4>)|(< \/h4>)|(<\/h5>)|(<\/ h5>)|(< \/ h5>)|(< \/h5>)|(<\/h6>)|(<\/ h6>)|(< \/ h6>)|(< \/h6>)/gm, '');
+                }
+                //^(<p.+?>)
+
+                //noodle.format
+                //noodle.value
+                //noodle.attributes
+                //noodle.alt
+                //noodle.subElements
+
+                //console.log(noodle);
+                //find inner html elements and recursivly call boiler to place in subElements which is also an instance of clsNoodle
+            });
+
+            console.log(this.pasta);
+        }
+
+        strainer()
+        {
+
+        }
     }
 
-    function createElementFromHTMLString(htmlString) 
-    {
-        let nodeEl = new DOMParser().parseFromString(htmlString, 'text/html').body.childNodes;
-        return nodeEl;
-    }
-
-    function GetChildren(el)
-    {
-
-    }
+    //if pasta is made of noodles what are noodles made of? (semolina)
     
-    class clsElement
+    class clsNoodle
     {
         constructor()
         {
-            this.format = '';
-            this.text = '';
+            this.format = ''; //image, nothing, bold,
+            this.value = ''; //strings, 64bit encoded string for images
+            this.attributes = [];
+            this.alt = '';
+            this.subElements = []; //array of boiler
+            //Need a strainer
         }
     }
+
+    let chef = new noodleMaker(
+        {
+            editorElement: editorel
+        });
+
+    processel.addEventListener('click', function()
+    {
+        chef.noodles();
+    });
+    
+
+    /* 
+    Elements:
+        H1-6 //linebreak
+        p //linebreak
+        b
+        span
+        img
+        a
+        string
+        i
+        em
+        mark
+        small
+        del
+        ins
+        sub
+        sup
+        small
+        blockquote 
+        abbr 
+        address
+        cite
+        <!-- -->
+
+    Attributes:
+        alt
+        width
+        height
+        src
+        title
+        href
+
+    */
+    //(^#{1}[[:space:]]) H1
+
+    // let ffff = `
+    // # H1
+    // ## H2
+    // ### H3 
+    // #### H4 
+    // `; 
+
+    // console.log(ffff);
+
+    // const g = new RegExp('^#{1}[? ]');
+
+    // console.log(g.test(ffff));
+
 
 </script>
 
