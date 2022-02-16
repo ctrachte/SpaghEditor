@@ -62,7 +62,8 @@ export default class TheChef {
     RegExpScore.matchHeading6 = /^#{6}[? ]/.test(raw) ? 30 : 0; // very high score
     // RegExpScore.matchBold = /^(*{2}|_{2}){1}(.+)+\1$/.test(raw); // medium score
     RegExpScore.matchItalic = /\*.*\*/.test(raw) ? 5 : 0; // low score
-    RegExpScore.matchBold = /\*\*.*\*\*\*/.test(raw) ? 10 : 0; // low score
+    RegExpScore.matchBold = /\*\*.*\*\*/.test(raw) ? 10 : 0; // low score
+    RegExpScore.matchStrikeThrough = /\~\~.*\~\~/.test(raw) ? 20 : 0; // high score
     RegExpScore.matchLink = /\[(.+)\]\(([^ ]+?)( "(.+)")?\)/.test(raw) ? 50 : 0; // very high score
     RegExpScore.total = 0;
     // total score:
