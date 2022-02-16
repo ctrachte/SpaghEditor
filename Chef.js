@@ -91,19 +91,7 @@ export default class TheChef {
     return text.split("\n");
   }
   makePasta() {
-    this.noodles = this.noodles.map(
-      function (noodle) {
-        let value = noodle;
-        noodle = new Object();
-        noodle.value = value;
-        noodle.type = {
-          html: this.htmlScore(noodle.value),
-          markdownScore: this.markdownScore(noodle.value),
-          json: this.isJson(noodle.value),
-        };
-        return noodle;
-      }.bind(this)
-    );
+    // parse based on type
     this.parseHtml();
   }
   plateDish() {
@@ -124,7 +112,7 @@ export default class TheChef {
       function (noodle, index) {
         // turn html raw text line into new clsElement();
         let options = {};
-        options.text = noodle.value.value;
+        options.text = noodle.value;
         options.elementType = 'p';
         let newElement = new clsElement(options);
         pasta.push(newElement);
@@ -136,7 +124,6 @@ export default class TheChef {
     // turn raw text line into new clsElement();
   }
 }
-
 // our final product will be an array of these, which spagheditor can interpret
 class clsElement {
   constructor(props) {
