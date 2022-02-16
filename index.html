@@ -8,15 +8,19 @@
   </head>
   <body>
     <h3>Spagheditor - Throw everything at the wall and see what sticks</h3>
-    <div class="testText"></div>
+    <div id="testText"></div>
+    <hr/>
     <!--Author View-->
-    <div class="editorel" contenteditable="true">
+    <h4 class="headingText">Input</h4>
+    <h4 class="headingText">Preview</h4>
+    <div id="editor" contenteditable="true">
     </div>
-    <button class="processel">Process</button>
-    <!--Code View-->
-    <textarea cols="6" rows="6" style="width: 50%; height: 300px;"></textarea>
-    <!--Preview View-->
     <div id="previewView"></div>
+    <textarea id="rawText" cols="6" rows="6" placeholder="markdown, raw text, code goes here"></textarea>
+
+    <button id="processButton">Process</button>
+    <!--Code View-->
+    <!--Preview View-->
 
     <style>
       html, body
@@ -27,18 +31,44 @@
           margin: 0;
           padding: 0;
       }
-      body
-      {
-          padding: .5rem;
+      h4, h3, button {
+        padding:1rem;
+        margin: 1rem;
       }
-      .editorel
+      .headingText {
+        width: 40%;
+        display: inline-block;
+      }
+      #editor
       {
+        margin: .5rem;
+          display: inline-block;
           padding: 1rem; 
-          width: 90%; 
+          width: 40%; 
           height: 600px; 
           max-height: 600px; 
           overflow-y: scroll; 
           border: 1px solid #969696;
+      }
+      #previewView {
+        margin: .5rem;
+
+        display:inline-block;
+        width: 40%;
+        height: 600px; 
+        padding: 1rem; 
+        border: 1px solid #969696;
+      }
+      #rawText {
+        margin: .5rem;
+
+        width: 40%; 
+        padding: 1rem; 
+      }
+      #processButton {
+        display: block;
+        padding: 10px;
+        margin: 10px;
       }
   </style>
     <script type="module">
