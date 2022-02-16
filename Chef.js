@@ -14,7 +14,6 @@ export default class TheChef {
       (this.makePasta = this.makePasta.bind(this)),
       (this.parseHtml = this.parseHtml.bind(this)),
       (this.brain = this.brain.bind(this));
-      console.log(this)
     this.plateDish = this.plateDish.bind(this);
     this.makePasta = this.makePasta.bind(this);
     this.brain();
@@ -124,7 +123,6 @@ export default class TheChef {
     this.noodles.map(
       function (noodle, index) {
         // turn html raw text line into new clsElement();
-        console.log(noodle)
         let options = {};
         options.text = noodle.value.value;
         options.elementType = 'p';
