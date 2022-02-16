@@ -2,7 +2,8 @@
 
 export default class TheChef {
   constructor(props) {
-    (this.raw = props.raw),
+    (this.outputElement = props.outputElement),
+      (this.raw = props.raw),
       (this.json = props.json),
       (this.noodles = props.text),
       (this.html = props.html),
@@ -11,6 +12,8 @@ export default class TheChef {
       (this.markdownScore = this.markdownScore.bind(this)),
       (this.whatKindOfNoodles = this.whatKindOfNoodles.bind(this)),
       (this.brain = this.brain.bind(this));
+    this.plateDish = this.plateDish.bind(this);
+    this.makeSpaghetti = this.makeSpaghetti.bind(this);
     this.brain();
   }
   // equivalent of 'main' method
@@ -19,23 +22,10 @@ export default class TheChef {
     this.noodles = this.makeNoodles(this.raw);
     // determine type
     this.whatKindOfNoodles();
-    // TODO: need a method to parse for each type
-    this.noodles.forEach((noodle) => {
-      if (noodle.type.html) {
-        // parse html to json structure
-      } else if (noodle.type.json) {
-        // convert to either html, markdown depending on user input.
-      } else if (noodle.type.markdownScore.total > 0) {
-        // parse markdown to json structure
-      } else {
-        noodle.type.string = true;
-        console.warn(
-          "unable to determine raw ingredients, I dont know how to make your pasta!"
-        );
-        // make best guess of formatting and return json structure
-        // this.parseText(this.raw);
-      }
-    });
+    // parses based on type
+    this.makeSpaghetti();
+    // return completed JSON object, and appends to preview window
+    this.plateDish();
     // log values for devmode
     if (this.devMode) {
       console.table(this.noodles);
@@ -98,39 +88,33 @@ export default class TheChef {
   makeNoodles(text) {
     return text.split("\n");
   }
-  parseText(textLinesArray) {
-    //Pasting from MS Word
-    //class="MsoNormal"
-
-    //Parse by line
-    let linesObjArr = [];
-    for (let x = 0; x < textLinesArray.length; x++) {
-      let line = textLinesArray[x];
-      let newLine = [];
-      //newLine.elements.push()
-      let newElement = new clsElement();
-      newElement.text = JSON.stringify(textLinesArray[x]);
-      linesObjArr.push(newElement);
-    }
-    return linesObjArr;
-    // console.log(JSON.stringify(linesObjArr));
-    //editorel.value = '';
-
-    // linesObjArr.forEach((line) =>
-    // {
-    //     console.log(line);
-    //     //editorel.value += line + '\n';
-    // });
-
-    //editorel.value = JSON.stringify(linesObjArr);
+  plateDish(noodles) {
+    // converts raw noodles to a dish of spaghetti
+    noodles.map(
+      function (noodle, index) {
+        this.outputElement.appendChild(noodle.htmlElement);
+      }.bind(this)
+    );
+  }
+  parseMarkdown(noodle) {
+    // turn markdown text line into new clsElement();
+  }
+  parseHtml(noodle) {
+    // turn html raw text line into new clsElement();
+    let newElement = new clsElement();
+    newElement.text = JSON.stringify(textLine);
+    return newElement;
+  }
+  parseText(noodle) {
+    // turn raw text line into new clsElement();
   }
 }
 class clsElement {
-  constructor() {
+  constructor(props) {
     this.elementType = "div";
     this.format = "";
     this.text = "";
-    // this.htmlElement = document.createElement(this.elementType);
-    // this.htmlElement.innerHTML = this.text;
+    this.htmlElement = document.createElement(this.elementType);
+    this.htmlElement.innerHTML = this.text;
   }
 }
