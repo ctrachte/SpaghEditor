@@ -11,19 +11,22 @@ export default class TheChef {
       (this.devMode = true), // true if you want to see values logged
       (this.markdownScore = this.markdownScore.bind(this)),
       (this.whatKindOfNoodles = this.whatKindOfNoodles.bind(this)),
+      (this.makePasta = this.makePasta.bind(this)),
+      (this.parseHtml = this.parseHtml.bind(this)),
       (this.brain = this.brain.bind(this));
+      console.log(this)
     this.plateDish = this.plateDish.bind(this);
-    this.makeSpaghetti = this.makeSpaghetti.bind(this);
+    this.makePasta = this.makePasta.bind(this);
     this.brain();
   }
   // equivalent of 'main' method
   brain() {
     // seperate lines and evaluate
-    this.noodles = this.makeNoodles(this.raw);
+    this.noodles = this.separateNoodles(this.raw);
     // determine type
     this.whatKindOfNoodles();
     // parses based on type
-    this.makeSpaghetti();
+    this.makePasta();
     // return completed JSON object, and appends to preview window
     this.plateDish();
     // log values for devmode
@@ -85,13 +88,30 @@ export default class TheChef {
     }
     return true;
   }
-  makeNoodles(text) {
+  separateNoodles(text) {
     return text.split("\n");
   }
-  plateDish(noodles) {
+  makePasta() {
+    this.noodles = this.noodles.map(
+      function (noodle) {
+        let value = noodle;
+        noodle = new Object();
+        noodle.value = value;
+        noodle.type = {
+          html: this.htmlScore(noodle.value),
+          markdownScore: this.markdownScore(noodle.value),
+          json: this.isJson(noodle.value),
+        };
+        return noodle;
+      }.bind(this)
+    );
+    this.parseHtml();
+  }
+  plateDish() {
     // converts raw noodles to a dish of spaghetti
-    noodles.map(
+    this.pasta.map(
       function (noodle, index) {
+        // console.log(noodle, this.outputElement)
         this.outputElement.appendChild(noodle.htmlElement);
       }.bind(this)
     );
@@ -99,22 +119,33 @@ export default class TheChef {
   parseMarkdown(noodle) {
     // turn markdown text line into new clsElement();
   }
-  parseHtml(noodle) {
-    // turn html raw text line into new clsElement();
-    let newElement = new clsElement();
-    newElement.text = JSON.stringify(textLine);
-    return newElement;
+  parseHtml() {
+    let pasta = [];
+    this.noodles.map(
+      function (noodle, index) {
+        // turn html raw text line into new clsElement();
+        console.log(noodle)
+        let options = {};
+        options.text = noodle.value.value;
+        options.elementType = 'p';
+        let newElement = new clsElement(options);
+        pasta.push(newElement);
+      }.bind(this)
+    );
+    this.pasta = pasta;
   }
   parseText(noodle) {
     // turn raw text line into new clsElement();
   }
 }
+
+// our final product will be an array of these, which spagheditor can interpret
 class clsElement {
   constructor(props) {
-    this.elementType = "div";
+    this.elementType =  props.elementType || "div";
     this.format = "";
-    this.text = "";
+    this.text = props.text || "";
     this.htmlElement = document.createElement(this.elementType);
-    this.htmlElement.innerHTML = this.text;
+    this.htmlElement.innerHTML = props.text;
   }
 }
