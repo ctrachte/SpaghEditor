@@ -103,7 +103,7 @@ export default class TheChef {
         } else if (noodle.type.markdownScore > 30) {
           this.parseMarkdown(noodle);
         } else {
-          this.parseText;
+          this.parseText(noodle);
         }
       }.bind(this)
     );
@@ -118,10 +118,10 @@ export default class TheChef {
     );
   }
   parseHtml(noodle) {
-    // turn markdown text line into new clsElement();
+    // turn html element (noodle) into new clsElement();
   }
   parseMarkdown(noodle) {
-    // turn html raw text line into new clsElement();
+    // turn markdown raw text line into new clsElement();
   }
   parseText(noodle) {
     // turn raw text line into new clsElement();
