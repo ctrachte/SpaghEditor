@@ -97,11 +97,11 @@ export default class TheChef {
     this.noodles.map(
       function (noodle, index) {
         if (noodle.type.html) {
-
+          //parseHtml
         } else if (noodle.type.JSON) {
-
+          // parse JSON
         } else {
-          this.parseHtml(noodle);
+          this.parseMarkdown(noodle);
         }
       }.bind(this)
     );
@@ -115,10 +115,10 @@ export default class TheChef {
       }.bind(this)
     );
   }
-  parseMarkdown(noodle) {
+  parseHtml(noodle) {
     // turn markdown text line into new clsElement();
   }
-  parseHtml(noodle) {
+  parseMarkdown(noodle) {
     // turn html raw text line into new clsElement();
     let options = {};
     options.text = noodle.value;
