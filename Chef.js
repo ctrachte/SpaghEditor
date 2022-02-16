@@ -21,6 +21,7 @@ export default class TheChef {
   // equivalent of 'main' method
   brain() {
     // seperate lines and evaluate
+    // this currently only works with raw text, will need to evaluate raw, unseparated first to determine type.
     this.noodles = this.separateNoodles(this.raw);
     // determine type
     this.whatKindOfNoodles();
@@ -88,6 +89,7 @@ export default class TheChef {
     }
     return true;
   }
+  // seperates lines of raw text, can only be used on raw text, not markdown or html
   separateNoodles(text) {
     return text.split("\n");
   }
