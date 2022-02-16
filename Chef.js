@@ -25,7 +25,7 @@ export default class TheChef {
         // parse html to json structure
       } else if (noodle.type.json) {
         // convert to either html, markdown depending on user input.
-      } else if (noodle.type.markdownScore > 0) {
+      } else if (noodle.type.markdownScore.total > 0) {
         // parse markdown to json structure
       } else {
         noodle.type.string = true;
@@ -43,17 +43,19 @@ export default class TheChef {
   }
   //parent method to determine type of each line/noodle
   whatKindOfNoodles() {
-    this.noodles = this.noodles.map(function (noodle) {
-      let value = noodle;
-      noodle = new Object();
-      noodle.value = value;
-      noodle.type = {
-        html: this.htmlScore(noodle.value),
-        markdownScore: this.markdownScore(noodle.value),
-        json: this.isJson(noodle.value),
-      };
-      return noodle;
-    }.bind(this));
+    this.noodles = this.noodles.map(
+      function (noodle) {
+        let value = noodle;
+        noodle = new Object();
+        noodle.value = value;
+        noodle.type = {
+          html: this.htmlScore(noodle.value),
+          markdownScore: this.markdownScore(noodle.value),
+          json: this.isJson(noodle.value),
+        };
+        return noodle;
+      }.bind(this)
+    );
   }
   // scoring system to weight the chances that the string is a markdown string
   // TODO: Check for tabs, spaces, and replace
@@ -69,9 +71,7 @@ export default class TheChef {
     // RegExpScore.matchBold = /^(*{2}|_{2}){1}(.+)+\1$/.test(raw); // medium score
     RegExpScore.matchItalic = /\*.*\*/.test(raw) ? 5 : 0; // low score
     RegExpScore.matchBold = /\*\*.*\*\*\*/.test(raw) ? 10 : 0; // low score
-    RegExpScore.matchLink = /\[(.+)\]\(([^ ]+?)( "(.+)")?\)/.test(raw)
-      ? 50
-      : 0; // very high score
+    RegExpScore.matchLink = /\[(.+)\]\(([^ ]+?)( "(.+)")?\)/.test(raw) ? 50 : 0; // very high score
     RegExpScore.total = 0;
     // total score:
     Object.values(RegExpScore).forEach((score) => {

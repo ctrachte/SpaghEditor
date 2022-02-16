@@ -9,10 +9,39 @@
   <body>
     <h3>Spagheditor - Throw everything at the wall and see what sticks</h3>
     <div class="testText"></div>
-    <style></style>
+    <!--Author View-->
+    <div class="editorel" contenteditable="true">
+    </div>
+    <button class="processel">Process</button>
+    <!--Code View-->
+    <textarea cols="6" rows="6" style="width: 50%; height: 300px;"></textarea>
+    <!--Preview View-->
+    <div id="previewView">
 
     <button class="processel">Process</button>
-
+    <style>
+      html, body
+      {
+          height: 100%;
+          width: 100%;
+          max-width: calc(100vw);
+          margin: 0;
+          padding: 0;
+      }
+      body
+      {
+          padding: .5rem;
+      }
+      .editorel
+      {
+          padding: 1rem; 
+          width: 90%; 
+          height: 600px; 
+          max-height: 600px; 
+          overflow-y: scroll; 
+          border: 1px solid #969696;
+      }
+  </style>
     <script type="module">
       import Chef from './Chef.js'
       let testText = `The Egg
@@ -180,7 +209,7 @@ And I sent you on your way.`
           'text': testText,
           'raw': testMarkdown
       }
-      let GordonRamsay = new Chef(options)
+      let GordonRamsay = new Chef(options);
     </script>
   </body>
 </html>
