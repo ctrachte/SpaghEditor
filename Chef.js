@@ -92,8 +92,19 @@ export default class TheChef {
     return text.split("\n");
   }
   makePasta() {
+    this.pasta = [];
     // parse based on type
-    this.parseHtml();
+    this.noodles.map(
+      function (noodle, index) {
+        if (noodle.type.html) {
+
+        } else if (noodle.type.JSON) {
+
+        } else {
+          this.parseHtml(noodle);
+        }
+      }.bind(this)
+    );
   }
   plateDish() {
     // converts raw noodles to a dish of spaghetti
@@ -107,19 +118,13 @@ export default class TheChef {
   parseMarkdown(noodle) {
     // turn markdown text line into new clsElement();
   }
-  parseHtml() {
-    let pasta = [];
-    this.noodles.map(
-      function (noodle, index) {
-        // turn html raw text line into new clsElement();
-        let options = {};
-        options.text = noodle.value;
-        options.elementType = 'p';
-        let newElement = new clsElement(options);
-        pasta.push(newElement);
-      }.bind(this)
-    );
-    this.pasta = pasta;
+  parseHtml(noodle) {
+    // turn html raw text line into new clsElement();
+    let options = {};
+    options.text = noodle.value;
+    options.elementType = "p";
+    let newElement = new clsElement(options);
+    this.pasta.push(newElement);
   }
   parseText(noodle) {
     // turn raw text line into new clsElement();
@@ -128,7 +133,7 @@ export default class TheChef {
 // our final product will be an array of these, which spagheditor can interpret
 class clsElement {
   constructor(props) {
-    this.elementType =  props.elementType || "div";
+    this.elementType = props.elementType || "div";
     this.format = "";
     this.text = props.text || "";
     this.htmlElement = document.createElement(this.elementType);
