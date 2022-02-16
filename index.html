@@ -9,68 +9,73 @@
   <body>
     <h3>Spagheditor - Throw everything at the wall and see what sticks</h3>
     <div id="testText"></div>
-    <hr/>
+    <hr />
     <!--Author View-->
     <h4 class="headingText">Input</h4>
     <h4 class="headingText">Preview</h4>
-    <div id="editor" contenteditable="true">
-    </div>
+    <div id="editor" contenteditable="true"></div>
     <div id="previewView"></div>
-    <textarea id="rawText" cols="6" rows="6" placeholder="markdown, raw text, code goes here"></textarea>
+    <textarea
+      id="rawText"
+      cols="6"
+      rows="6"
+      placeholder="markdown, raw text, code goes here"
+    ></textarea>
 
     <button id="processButton">Process</button>
     <!--Code View-->
     <!--Preview View-->
 
     <style>
-      html, body
-      {
-          height: 100%;
-          width: 100%;
-          max-width: calc(100vw);
-          margin: 0;
-          padding: 0;
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        max-width: calc(100vw);
+        margin: 0;
+        padding: 0;
       }
-      h4, h3, button {
-        padding:1rem;
+      h4,
+      h3,
+      button {
+        padding: 1rem;
         margin: 1rem;
       }
       .headingText {
         width: 40%;
         display: inline-block;
       }
-      #editor
-      {
-        margin: .5rem;
-          display: inline-block;
-          padding: 1rem; 
-          width: 40%; 
-          height: 600px; 
-          max-height: 600px; 
-          overflow-y: scroll; 
-          border: 1px solid #969696;
+      #editor {
+        margin: 0.5rem;
+        display: inline-block;
+        padding: 1rem;
+        width: 40%;
+        height: 600px;
+        max-height: 600px;
+        overflow-y: scroll;
+        border: 1px solid #969696;
       }
       #previewView {
-        margin: .5rem;
+        margin: 0.5rem;
 
-        display:inline-block;
+        display: inline-block;
         width: 40%;
-        height: 600px; 
-        padding: 1rem; 
+        height: 600px;
+        padding: 1rem;
         border: 1px solid #969696;
       }
       #rawText {
-        margin: .5rem;
+        margin: 0.5rem;
 
-        width: 40%; 
-        padding: 1rem; 
+        width: 40%;
+        padding: 1rem;
       }
       #processButton {
         display: block;
         padding: 10px;
         margin: 10px;
       }
-  </style>
+    </style>
     <script type="module">
       import Chef from './Chef.js'
       let testText = `The Egg
@@ -233,13 +238,19 @@ And I sent you on your way.`
 
           ![bears](http://placebear.com/200/200)
 
-          The end ...`;
+          The end ...`
+
+      const process = function () {""
+      document.getElementById('previewView').innerHTML = "";
       let options = {
-          'text': document.getElementById('editor').innerHTML || testText,
-          'raw': document.getElementById('rawText').innerHTML || testMarkdown,
-          'outputElement': document.getElementById('previewView')
+        text: document.getElementById('editor').innerHTML || testText,
+        raw: document.getElementById('rawText').value || testMarkdown,
+        outputElement: document.getElementById('previewView'),
       }
-      let GordonRamsay = new Chef(options);
+      let GordonRamsay = new Chef(options)
+      }
+      const processButton = document.getElementById('processButton')
+      processButton.addEventListener('click', process)
     </script>
   </body>
 </html>
