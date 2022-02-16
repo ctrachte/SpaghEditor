@@ -100,8 +100,10 @@ export default class TheChef {
           //parseHtml
         } else if (noodle.type.JSON) {
           // parse JSON
-        } else {
+        } else if (noodle.type.markdownScore > 30) {
           this.parseMarkdown(noodle);
+        } else {
+          this.parseText;
         }
       }.bind(this)
     );
@@ -120,14 +122,14 @@ export default class TheChef {
   }
   parseMarkdown(noodle) {
     // turn html raw text line into new clsElement();
+  }
+  parseText(noodle) {
+    // turn raw text line into new clsElement();
     let options = {};
     options.text = noodle.value;
     options.elementType = "p";
     let newElement = new clsElement(options);
     this.pasta.push(newElement);
-  }
-  parseText(noodle) {
-    // turn raw text line into new clsElement();
   }
 }
 // our final product will be an array of these, which spagheditor can interpret
