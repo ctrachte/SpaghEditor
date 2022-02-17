@@ -1,4 +1,175 @@
-let testText = `The Egg
+
+function parseHtmlIn(html)
+{
+    let parser = new DOMParser();
+    let htmlDoc;
+    let docBody;
+
+    if(typeof html === 'string')
+    {
+        htmlDoc = parser.parseFromString(html,"text/html");
+        docBody = htmlDoc.body;
+    }
+    else if (typeof html === 'object')
+    {
+        docBody = html;
+    }
+    else
+    {
+        console.error('unexpected type');
+    }
+
+    let nodesArr = [];
+
+    docBody.childNodes.forEach((nd) => 
+    {
+        // nd.nodeType
+        // 1 - element node
+        // 2 - attribute node
+        // 3 - text node
+        // 8 - comment node
+
+        let noodle = new clsNoodle();
+
+        switch(nd.nodeType)
+        {
+            case 1: //element node
+                if(nd.hasChildNodes()) //Multiple elements
+                {
+                    if(nd.childNodes.length == 1 && nd.childNodes[0].nodeType === 3) //Node with text
+                    {
+                        noodle.elementType = nd.nodeName.toString();
+                        noodle.value = nd.childNodes[0].textContent;
+
+                        if(nd.attributes.length > 0)
+                        {
+                            for(let i=0; i < nd.attributes.length; i++)
+                            {
+                                noodle.junkDrawer.push({name: nd.attributes[i].name, value: nd.attributes[i].value});
+                            }
+                        }
+
+                        nodesArr.push(noodle);
+                    }
+                    else if(nd.childNodes.length > 1)
+                    {
+                        noodle.elementType = nd.nodeName.toString();
+                        noodle.value = '';
+
+                        if(nd.attributes.length > 0)
+                        {
+                            for(let i=0; i < nd.attributes.length; i++)
+                            {
+                                noodle.junkDrawer.push({name: nd.attributes[i].name, value: nd.attributes[i].value});
+                            }
+                        }
+
+                        noodle.subElements.push(parseHtmlIn(nd));
+
+                        nodesArr.push(noodle);
+                    }                        
+                }
+                else //Single Element
+                {
+                    noodle.elementType = nd.nodeName.toString();
+                    noodle.value = '';
+                    if(nd.attributes.length > 0)
+                    {
+                        for(let i=0; i < nd.attributes.length; i++)
+                        {
+                            noodle.junkDrawer.push({name: nd.attributes[i].name, value: nd.attributes[i].value});
+                        }
+                    }
+                    nodesArr.push(noodle);
+                }
+                break;
+            case 2: //attribute node
+                console.error('attribute node')
+                break;
+            case 3: //text node
+                noodle.elementType = 'P';
+                noodle.value = nd.textContent;
+                nodesArr.push(noodle);
+                break;
+            case 8: //comment node
+                noodle.elementType = 'comment';
+                noodle.value = nd.textContent;
+                nodesArr.push(noodle);
+                break;
+            default: //Unhandled
+                console.error('Not handled')
+        }
+    });
+
+    return nodesArr;
+}
+
+function parseHtmlOut(obj)
+{
+    let newHtml = document.createElement('div');
+    if(typeof obj === 'object')
+    {
+        if(obj.length > 1)
+        {
+            obj.forEach((noodle) => 
+            {
+                let newEl = document.createElement(noodle.elementType.toString());
+                
+                if(noodle.junkDrawer.length > 0)
+                {
+                    noodle.junkDrawer.forEach((attribute) => 
+                    {
+                        newEl.setAttribute(attribute.name, attribute.value);
+                    });
+                }
+
+                newEl.innerText = noodle.value;
+
+                if(noodle.subElements.length > 0)
+                {
+                    noodle.subElements.forEach((subEl) =>
+                    {
+                        let children = parseHtmlOut(subEl);
+                        children = children.childNodes; //Delivered back in DIV but we don't need that
+
+                        children.forEach((node) =>
+                        {
+                            newEl.appendChild(node);
+                        });
+                    });
+                }
+
+                newHtml.appendChild(newEl);
+            });
+        }
+        else
+        {
+            console.error('single object or other issue');
+        }
+    }
+    else
+    {
+        console.error('Type not handled');
+    }
+
+    return newHtml;
+}
+
+class clsNoodle
+{
+    constructor()
+    {
+        this.elementType = '';
+        this.value = ''; //strings, 64bit encoded string for images
+        this.attributes = [];
+        this.alt = '';
+        this.subElements = []; //array of boiler
+        this.junkDrawer = []; //Unparsed attributes
+        //Need a strainer
+    }
+}
+
+    let testText = `The Egg
 # SpaghEditor
 ## SpaghEditor
 ### SpaghEditor
@@ -149,126 +320,11 @@ You thought for a long time.
 <!--“An egg.” <span>I answered.</span> “Now it’s time for you to move on to your next life.”-->
 
 And I sent you on your way.`;
-    editorel.innerText = testText;
 
-    function parseHtml(html)
-    {
-        let parser = new DOMParser();
-        let htmlDoc;
-        let docBody;
+    let noodleObj = parseHtmlIn(testText);
+    console.log(noodleObj);
 
-        if(typeof html === 'string')
-        {
-            htmlDoc = parser.parseFromString(html,"text/html");
-            docBody = htmlDoc.body;
-        }
-        else if (typeof html === 'object')
-        {
-            docBody = html;
-        }
-        else
-        {
-            console.error('unexpected type');
-        }
+    let htmlObj = parseHtmlOut(noodleObj);
+    console.log(htmlObj);
 
-        let nodesArr = [];
-
-        docBody.childNodes.forEach((nd) => 
-        {
-            // nd.nodeType
-            // 1 - element node
-            // 2 - attribute node
-            // 3 - text node
-            // 8 - comment node
-
-            let noodle = new clsNoodle();
-
-            switch(nd.nodeType)
-            {
-                case 1: //element node
-                    if(nd.hasChildNodes()) //Multiple elements
-                    {
-                        if(nd.childNodes.length == 1 && nd.childNodes[0].nodeType === 3) //Node with text
-                        {
-                            noodle.elementType = nd.nodeName.toString();
-                            noodle.value = nd.childNodes[0].textContent;
-
-                            if(nd.attributes.length > 0)
-                            {
-                                for(let i=0; i < nd.attributes.length; i++)
-                                {
-                                    noodle.junkDrawer.push({name: nd.attributes[i].name, value: nd.attributes[i].value});
-                                }
-                            }
-
-                            nodesArr.push(noodle);
-                        }
-                        else if(nd.childNodes.length > 1)
-                        {
-                            noodle.elementType = nd.nodeName.toString();
-                            noodle.value = '';
-
-                            if(nd.attributes.length > 0)
-                            {
-                                for(let i=0; i < nd.attributes.length; i++)
-                                {
-                                    noodle.junkDrawer.push({name: nd.attributes[i].name, value: nd.attributes[i].value});
-                                }
-                            }
-
-                            noodle.subElements.push(parseHtml(nd));
-
-                            nodesArr.push(noodle);
-                        }                        
-                    }
-                    else //Single Element
-                    {
-                        noodle.elementType = nd.nodeName.toString();
-                        noodle.value = '';
-                        if(nd.attributes.length > 0)
-                        {
-                            for(let i=0; i < nd.attributes.length; i++)
-                            {
-                                noodle.junkDrawer.push({name: nd.attributes[i].name, value: nd.attributes[i].value});
-                            }
-                        }
-                        nodesArr.push(noodle);
-                    }
-                    break;
-                case 2: //attribute node
-                    console.error('attribute node')
-                    break;
-                case 3: //text node
-                    noodle.elementType = 'P';
-                    noodle.value = nd.textContent;
-                    nodesArr.push(noodle);
-                    break;
-                case 8: //comment node
-                    noodle.elementType = 'comment';
-                    noodle.value = nd.textContent;
-                    nodesArr.push(noodle);
-                    break;
-                default: //Unhandled
-                    console.error('Not handled')
-            }
-        });
-
-        return nodesArr;
-    }
-
-    class clsNoodle
-    {
-        constructor()
-        {
-            this.elementType = '';
-            this.value = ''; //strings, 64bit encoded string for images
-            this.attributes = [];
-            this.alt = '';
-            this.subElements = []; //array of boiler
-            this.junkDrawer = []; //Unparsed attributes
-            //Need a strainer
-        }
-    }
-
-    let temp = parseHtml(testText);
-    console.log(temp);
+    document.body.append(htmlObj)
