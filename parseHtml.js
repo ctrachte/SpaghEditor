@@ -79,6 +79,8 @@ function parseHtmlIn(html)
                         {
                             switch(nd.attributes[i].name)
                             {
+                                case 'selected':
+                                case 'checked':
                                 case 'disabled':
                                 case 'readonly':
                                     //If attribute disabled/readonly has defined value add to array with existing value
