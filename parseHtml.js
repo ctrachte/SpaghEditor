@@ -1,4 +1,4 @@
-
+/** Parses HTML from String to an array of clsNoodle **/
 function parseHtmlIn(html)
 {
     let parser = new DOMParser();
@@ -45,7 +45,7 @@ function parseHtmlIn(html)
                         {
                             for(let i=0; i < nd.attributes.length; i++)
                             {
-                                noodle.junkDrawer.push({name: nd.attributes[i].name, value: nd.attributes[i].value});
+                                noodle.attributes.push({name: nd.attributes[i].name, value: nd.attributes[i].value});
                             }
                         }
 
@@ -60,7 +60,7 @@ function parseHtmlIn(html)
                         {
                             for(let i=0; i < nd.attributes.length; i++)
                             {
-                                noodle.junkDrawer.push({name: nd.attributes[i].name, value: nd.attributes[i].value});
+                                noodle.attributes.push({name: nd.attributes[i].name, value: nd.attributes[i].value});
                             }
                         }
 
@@ -77,7 +77,29 @@ function parseHtmlIn(html)
                     {
                         for(let i=0; i < nd.attributes.length; i++)
                         {
-                            noodle.junkDrawer.push({name: nd.attributes[i].name, value: nd.attributes[i].value});
+                            switch(nd.attributes[i].name)
+                            {
+                                case 'disabled':
+                                case 'readonly':
+                                    //If attribute disabled/readonly has defined value add to array with existing value
+                                    if(typeof nd.attributes[i].value !== 'undefined' && nd.attributes[i].value.length > 0)
+                                    {
+                                        noodle.attributes.push({name: nd.attributes[i].name, value: nd.attributes[i].value});
+                                    }
+                                    //If value does not exist for disabled/readonly add to array with true
+                                    else
+                                    {
+                                        noodle.attributes.push({name: nd.attributes[i].name, value: true});
+                                    }
+                                    break;
+                                default: 
+                                    //If value exists add to array
+                                    if(nd.attributes[i].value && nd.attributes[i].value.length > 0)
+                                    {
+                                        noodle.attributes.push({name: nd.attributes[i].name, value: nd.attributes[i].value});
+                                    }
+                                    else {} //If no value exists do not add to array
+                            }
                         }
                     }
                     nodesArr.push(noodle);
@@ -104,6 +126,7 @@ function parseHtmlIn(html)
     return nodesArr;
 }
 
+/** Parses array of clsNoodle to HTML Elements **/
 function parseHtmlOut(obj)
 {
     let newHtml = document.createElement('div');
@@ -115,9 +138,9 @@ function parseHtmlOut(obj)
             {
                 let newEl = document.createElement(noodle.elementType.toString());
                 
-                if(noodle.junkDrawer.length > 0)
+                if(noodle.attributes.length > 0)
                 {
-                    noodle.junkDrawer.forEach((attribute) => 
+                    noodle.attributes.forEach((attribute) => 
                     {
                         newEl.setAttribute(attribute.name, attribute.value);
                     });
@@ -155,17 +178,21 @@ function parseHtmlOut(obj)
     return newHtml;
 }
 
+/**
+ * Class representation of lines/blocks of data in document
+ * this.elementType {string} - represents the type of container for this line of data
+ * this.value {string} - innertext or string value of line of data/block. 64bit encoded images, etc
+ * this.attributes {object[]} - array of attributes and values
+ * this.subElements {object[]} - array of clsNoodle instances that make up child nodes of parent clsNoodle instance
+ */
 class clsNoodle
 {
     constructor()
     {
         this.elementType = '';
         this.value = ''; //strings, 64bit encoded string for images
-        this.attributes = [];
-        this.alt = '';
+        this.attributes = []; //All attributes here. If empty discard. 
         this.subElements = []; //array of boiler
-        this.junkDrawer = []; //Unparsed attributes
-        //Need a strainer
     }
 }
 
