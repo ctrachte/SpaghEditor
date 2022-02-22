@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Spagheditor - Throw everything at the wall and see what sticks</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        max-width: calc(100vw);
+        margin: 0;
+        padding: 0;
+      }
+      button {
+        padding: 1rem;
+        margin: 1rem;
+      }
+      .markdown {
+        margin: 0.5rem;
+        display: inline-block;
+        padding: 1rem;
+        width: 90%;
+        height: 600px;
+        max-height: 600px;
+        overflow-y: scroll;
+        border: 1px solid #969696;
+      }
+    </style>
+</head>
+<body>
+<h3>Spagheditor - Throw everything at the wall and see what sticks</h3>
+<textarea class="markdown">
+	
+</textarea>
+<br />
+<button class="parse">Parse</button>
+
+<script>
+
+document.querySelector('.markdown').value = `# Markdown syntax guide
+
+## Headers
+
+# This is a Heading h1
+## This is a Heading h2 
+###### This is a Heading h6
+
+## Emphasis
+
+*This text will be italic*  
+_This will also be italic_
+
+**This text will be bold**  
+__This will also be bold__
+
+_You **can** combine them_
+
+## Lists
+
+### Unordered
+
+* Item 1
+* Item 2
+* Item 2a
+* Item 2b
+
+### Ordered
+
+1. Item 1
+1. Item 2
+1. Item 3
+  1. Item 3a
+  1. Item 3b
+
+## Images
+
+![This is a alt text.](/image/sample.png "This is a sample image.")
+
+## Links
+
+You may be using [Markdown Live Preview](https://markdownlivepreview.com/).
+
+## Blockquotes
+
+> Markdown is a lightweight markup language with plain-text-formatting syntax, created in 2004 by John Gruber with Aaron Swartz.
+>
+>> Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.
+
+## Tables
+
+| Left columns  | Right columns |
+| ------------- |:-------------:|
+| left foo      | right foo     |
+| left bar      | right bar     |
+| left baz      | right baz     |
+
+## Blocks of code
+
+\`\`\`
+let message = 'Hello world';
+alert(message);
+\`\`\`
+
+## Inline code
+
+This web site is using \`markedjs/marked\`.
+`;
+
+class clsNoodle
+{
+    constructor()
+    {
+        this.elementType = '';
+        this.value = ''; //strings, 64bit encoded string for images
+        // this.attributes = [];
+        // this.alt = '';
+        this.subElements = []; //array of boiler
+        // this.junkDrawer = []; //Unparsed attributes
+    }
+}
+
+const WHOLE_LINE_FMT = {
+	'h1': /^#{1} /,
+	'h2': /^#{2} /,
+	'h3': /^#{3} /,
+	'h4': /^#{4} /,
+	'h5': /^#{5} /,
+	'h6': /^#{6} /,
+	'blockquote': /^>( ){0,4}/,
+	'ol_li': /^(\+|\-|\*)( )*/, // TODO: counting and recording indentation may be necessary
+	'ul_li': /^[0-9]*.( )+/  // TODO: counting and recording indentation may be necessary
+};
+
+function boil(text) { //Format single line
+
+	// 1. MD reads multiple spaces as one space, EXCEPT for in a code block
+	text = text.replaceAll(/ {1,}/g,' ');
+	return text;
+
+}
+
+document.querySelector('.parse').addEventListener('click',function() {
+
+	let mdText = document.querySelector('.markdown').value;
+
+	let mdLines = mdText.split("\n");
+	let noodles = [], noodle, subNoodle;
+	let line = '';
+	let midCodeBlock = false;
+
+	for (var lineNum = 0; lineNum < mdLines.length; lineNum++) {
+
+		line = mdLines[lineNum];
+		line = line.replace('\t','    '); // a tab (in most cases unlikely to be noticed by md) is like 4 spaces.
+		
+		if (midCodeBlock) {
+
+			if (line.replace(/^ {4}/,'').startsWith('```')) {
+				noodles.push(noodle);
+				midCodeBlock = false;
+				continue;
+			} else {
+				subNoodle = new clsNoodle();
+				subNoodle.value = mdLines[lineNum];
+				noodle.subElements.push(subNoodle);
+				continue;
+			}
+			
+		}
+
+		if (!line.trim()) { //flavorless
+			continue;
+		}
+
+		noodle = new clsNoodle();
+
+		if (/^ {4}/.test(line)) { // A ONE-LINE CODE BLOCK
+			noodle.elementType = 'code_block';
+			noodle.text = line.replace(/^ {4}/,'');
+			noodles.push(noodle);
+			continue;
+		}
+
+		line = line.replace(/^ */,'');
+
+		if (line.startsWith('```')) { // A MULTI-LINE CODE BLOCK
+			noodle.elementType = 'code_block';
+			//at this point we must continue to add lines (without boiling) until we find a closing ```
+			midCodeBlock = true;
+			continue;
+		}
+
+		for (const [eType, pattern] of Object.entries(WHOLE_LINE_FMT)) {
+			if (pattern.test(line)) {
+				noodle.elementType = eType;
+				line = line.replace(pattern,'');
+				break;
+			}
+		}
+
+		noodle.value = boil(line);
+		noodles.push(noodle);
+
+	}
+
+	//Now that all lines have been parsed, a grouping (lis within ul/ol may be in order)
+
+	console.log(noodles);
+
+});
+
+</script>
+
+</body>
+</html>
