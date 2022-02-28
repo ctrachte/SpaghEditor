@@ -38,74 +38,85 @@
 
 <script>
 
-document.querySelector('.markdown').value = `# Markdown syntax guide
+document.querySelector('.markdown').value = `A **bold stuff** B **some more** C
 
-## Headers
+_Starts with Italics_ rest is loose goose
 
-# This is a Heading h1
-## This is a Heading h2 
-###### This is a Heading h6
+Starts loose goose _ends with italics_ and **some bold**
 
-## Emphasis
+And *now let us try some __nesting__*
 
-*This text will be italic*  
-_This will also be italic_
-
-**This text will be bold**  
-__This will also be bold__
-
-_You **can** combine them_
-
-## Lists
-
-### Unordered
-
-* Item 1
-* Item 2
-* Item 2a
-* Item 2b
-
-### Ordered
-
-1. Item 1
-1. Item 2
-1. Item 3
-  1. Item 3a
-  1. Item 3b
-
-## Images
-
-![This is a alt text.](/image/sample.png "This is a sample image.")
-
-## Links
-
-You may be using [Markdown Live Preview](https://markdownlivepreview.com/).
-
-## Blockquotes
-
-> Markdown is a lightweight markup language with plain-text-formatting syntax, created in 2004 by John Gruber with Aaron Swartz.
->
->> Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.
-
-## Tables
-
-| Left columns  | Right columns |
-| ------------- |:-------------:|
-| left foo      | right foo     |
-| left bar      | right bar     |
-| left baz      | right baz     |
-
-## Blocks of code
-
-\`\`\`
-let message = 'Hello world';
-alert(message);
-\`\`\`
-
-## Inline code
-
-This web site is using \`markedjs/marked\`.
+And __the other kind of *nesting*__
 `;
+
+// document.querySelector('.markdown').value = `# Markdown syntax guide
+
+// ## Headers
+
+// # This is a Heading h1
+// ## This is a Heading h2 
+// ###### This is a Heading h6
+
+// ## Emphasis
+
+// *This text will be italic*  
+// _This will also be italic_
+
+// **This text will be bold**  
+// __This will also be bold__
+
+// _You **can** combine them_
+
+// ## Lists
+
+// ### Unordered
+
+// * Item 1
+// * Item 2
+// * Item 2a
+// * Item 2b
+
+// ### Ordered
+
+// 1. Item 1
+// 1. Item 2
+// 1. Item 3
+//   1. Item 3a
+//   1. Item 3b
+
+// ## Images
+
+// ![This is a alt text.](/image/sample.png "This is a sample image.")
+
+// ## Links
+
+// You may be using [Markdown Live Preview](https://markdownlivepreview.com/).
+
+// ## Blockquotes
+
+// > Markdown is a lightweight markup language with plain-text-formatting syntax, created in 2004 by John Gruber with Aaron Swartz.
+// >
+// >> Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.
+
+// ## Tables
+
+// | Left columns  | Right columns |
+// | ------------- |:-------------:|
+// | left foo      | right foo     |
+// | left bar      | right bar     |
+// | left baz      | right baz     |
+
+// ## Blocks of code
+
+// \`\`\`
+// let message = 'Hello world';
+// alert(message);
+// \`\`\`
+
+// ## Inline code
+
+// This web site is using \`markedjs/marked\`.
+// `;
 
 class clsNoodle
 {
@@ -113,7 +124,7 @@ class clsNoodle
     {
         this.elementType = '';
         this.value = ''; //strings, 64bit encoded string for images
-        // this.attributes = [];
+        this.attributes = [];
         // this.alt = '';
         this.subElements = []; //array of boiler
         // this.junkDrawer = []; //Unparsed attributes
@@ -128,15 +139,86 @@ const WHOLE_LINE_FMT = {
 	'h5': /^#{5} /,
 	'h6': /^#{6} /,
 	'blockquote': /^>( ){0,4}/,
-	'ol_li': /^(\+|\-|\*)( )*/, // TODO: counting and recording indentation may be necessary
-	'ul_li': /^[0-9]*.( )+/  // TODO: counting and recording indentation may be necessary
+	'ul_li': /^(\+|\-|\*) +/, // TODO: counting and recording indentation may be necessary
+	'ol_li': /^[0-9]*\. +/  // TODO: counting and recording indentation may be necessary
 };
 
-function boil(text) { //Format single line
+const WITHIN_LINE_FMT = [
+	{ //image
+		patterns: [
+			/!\[(.*?)\]\((.*?)\)/
+		],
+		func: function(match) {
+			let noodle = new clsNoodle();
+			noodle.elementType = 'img';
+			noodle.attributes = {'alt': 'WHATEVER', 'src': 'WHATEVER', 'title': 'WHATEVER'};
+			return noodle;
+		}
+	},
+	{ //italic
+		patterns: [
+			/(?<!\*)\*(?!(\*| ))(.+?)(?<! )(?<!\*)\*(?!\*)/g,
+			/(?<!_)_(?!(_| ))(.+?)(?<! )(?<!_)_(?!_)/g
+		],
+		func: function(match) {
+			let noodle = new clsNoodle();
+			noodle.elementType = 'em';
+			noodle.value = match[2];
+			return boil(noodle);
+		}
+	},
+	{ //bold
+		patterns: [
+			/(?<!\*)\*\*(?!(\*| ))(.+?)(?<! )(?<!\*)\*\*(?!\*)/g,
+			/(?<!_)__(?!(_| ))(.+?)(?<! )(?<!_)__(?!_)/g,
+		],
+		func: function(match) {
+			let noodle = new clsNoodle();
+			noodle.elementType = 'strong';
+			noodle.value = match[2];
+			return boil(noodle);
+		}
+	}
+];
+
+function boil(noodle) { //Format single line
+
+	text = noodle.value;
 
 	// 1. MD reads multiple spaces as one space, EXCEPT for in a code block
 	text = text.replaceAll(/ {1,}/g,' ');
-	return text;
+
+	// 2. Look for patterns (IN WHAT ORDER???) ... OR DO WE WAIT FOR !!!ALL!!! MATCHES AND SEE IF ONE CONTAINS ANOTHER?
+	for (const flavor of WITHIN_LINE_FMT) {
+		for (const pattern of flavor.patterns) {
+			matches = [];
+			while (match = pattern.exec(text)) {
+				matches.push(match);
+			}
+			if (matches.length) {
+				noodle.value = '';
+				let lastIdx = 0;
+				let match, preMatch;
+				while (true) {
+					match = matches.shift();
+					preMatch = text.substring(lastIdx, match ? match.index : Infinity);
+					if (preMatch) {
+						noodle.subElements.push(preMatch);
+					}
+					if (match) {
+						noodle.subElements.push(flavor.func(match));
+						lastIdx = match.index + match[0].length;
+					} else {
+						break;
+					}
+				}
+				return noodle;
+			}
+		}
+	}
+
+	// 3. If we get here, it should be left as a plain text noodle
+	return noodle;
 
 }
 
@@ -145,7 +227,7 @@ document.querySelector('.parse').addEventListener('click',function() {
 	let mdText = document.querySelector('.markdown').value;
 
 	let mdLines = mdText.split("\n");
-	let noodles = [], noodle, subNoodle;
+	let noodles = [], noodleGroup = null, noodleGroupEType, noodle, subNoodle;
 	let line = '';
 	let midCodeBlock = false;
 
@@ -176,7 +258,7 @@ document.querySelector('.parse').addEventListener('click',function() {
 		noodle = new clsNoodle();
 
 		if (/^ {4}/.test(line)) { // A ONE-LINE CODE BLOCK
-			noodle.elementType = 'code_block';
+			noodle.elementType = 'codeblock';
 			noodle.text = line.replace(/^ {4}/,'');
 			noodles.push(noodle);
 			continue;
@@ -185,7 +267,7 @@ document.querySelector('.parse').addEventListener('click',function() {
 		line = line.replace(/^ */,'');
 
 		if (line.startsWith('```')) { // A MULTI-LINE CODE BLOCK
-			noodle.elementType = 'code_block';
+			noodle.elementType = 'codeblock';
 			//at this point we must continue to add lines (without boiling) until we find a closing ```
 			midCodeBlock = true;
 			continue;
@@ -199,12 +281,36 @@ document.querySelector('.parse').addEventListener('click',function() {
 			}
 		}
 
-		noodle.value = boil(line);
-		noodles.push(noodle);
+		noodle.value = line;
+		noodle = boil(noodle);
+
+		// Group noodles into certain types
+		if (['ol_li','ul_li'].includes(noodle.elementType)) {
+			noodleGroupEType = noodle.elementType.split('_')[0];
+			noodle.elementType = noodle.elementType.split('_')[1];
+		} else {
+			noodleGroupEType = null;
+		}
+
+		if (noodleGroup) { //either add noodle to the group (and continue loop) or close group
+			if (noodleGroupEType == noodleGroup.elementType) {
+				noodleGroup.subElements.push(noodle);
+				continue;
+			} else { //close group
+				noodles.push(noodleGroup);
+				noodleGroup = null;
+			}
+		}
+
+		if (noodleGroupEType) { //either create a new group or add to the root level
+			noodleGroup = new clsNoodle();
+			noodleGroup.elementType = noodleGroupEType;
+			noodleGroup.subElements.push(noodle);
+		} else {
+			noodles.push(noodle);
+		}
 
 	}
-
-	//Now that all lines have been parsed, a grouping (lis within ul/ol may be in order)
 
 	console.log(noodles);
 
