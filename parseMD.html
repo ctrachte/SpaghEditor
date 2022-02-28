@@ -47,6 +47,8 @@ Starts loose goose _ends with italics_ and **some bold**
 And *now let us try some __nesting__*
 
 And __the other kind of *nesting*__
+
+_**This** will be interesting_
 `;
 
 // document.querySelector('.markdown').value = `# Markdown syntax guide
@@ -181,43 +183,64 @@ const WITHIN_LINE_FMT = [
 	}
 ];
 
-function boil(noodle) { //Format single line
+function boil(noodle,root=false) { //Format single line
 
-	text = noodle.value;
+	let text = noodle.value;
 
 	// 1. MD reads multiple spaces as one space, EXCEPT for in a code block
 	text = text.replaceAll(/ {1,}/g,' ');
 
-	// 2. Look for patterns (IN WHAT ORDER???) ... OR DO WE WAIT FOR !!!ALL!!! MATCHES AND SEE IF ONE CONTAINS ANOTHER?
+	// 2. Look for patterns
+	let allMatches = [];
+	let match;
 	for (const flavor of WITHIN_LINE_FMT) {
 		for (const pattern of flavor.patterns) {
-			matches = [];
 			while (match = pattern.exec(text)) {
-				matches.push(match);
-			}
-			if (matches.length) {
-				noodle.value = '';
-				let lastIdx = 0;
-				let match, preMatch;
-				while (true) {
-					match = matches.shift();
-					preMatch = text.substring(lastIdx, match ? match.index : Infinity);
-					if (preMatch) {
-						noodle.subElements.push(preMatch);
-					}
-					if (match) {
-						noodle.subElements.push(flavor.func(match));
-						lastIdx = match.index + match[0].length;
-					} else {
-						break;
-					}
-				}
-				return noodle;
+				match.func = flavor.func;
+				allMatches.push(match);
 			}
 		}
 	}
 
-	// 3. If we get here, it should be left as a plain text noodle
+	if (allMatches.length) {
+		noodle.value = '';
+
+		// 3. Hold off on matches that intersect with others
+		let matches = [];
+		let lastIdx = 0;
+		allMatches.sort((m1,m2) => m1.index - m2.index);
+		allMatches.forEach(match => {
+			let start = match.index;
+			let end   = match.index + match[0].length;
+			if (start >= lastIdx) {
+				matches.push(match);
+				lastIdx = end;
+			}
+		});
+
+		// 4. Break down into noodles;
+		lastIdx = 0;
+		let match, preMatch, simpleNoodle;
+		while (true) {
+			match = matches.shift();
+			preMatch = text.substring(lastIdx, match ? match.index : Infinity);
+			if (preMatch) {
+				let simpleNoodle = new clsNoodle();
+				simpleNoodle.value = preMatch;
+				noodle.subElements.push(simpleNoodle);
+			}
+			if (match) {
+				noodle.subElements.push(match.func(match));
+				lastIdx = match.index + match[0].length;
+			} else {
+				break;
+			}
+		}
+		return noodle;
+
+	}
+
+	// 5. If we get here, it should be left as a plain text noodle
 	return noodle;
 
 }
@@ -280,9 +303,12 @@ document.querySelector('.parse').addEventListener('click',function() {
 				break;
 			}
 		}
+		if (!noodle.elementType) {
+			noodle.elementType = 'p';
+		}
 
 		noodle.value = line;
-		noodle = boil(noodle);
+		noodle = boil(noodle,true);
 
 		// Group noodles into certain types
 		if (['ol_li','ul_li'].includes(noodle.elementType)) {
