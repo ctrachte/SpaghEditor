@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Spagheditor - Throw everything at the wall and see what sticks</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        max-width: calc(100vw);
+        margin: 0;
+        padding: 0;
+      }
+      button {
+        padding: 1rem;
+        margin: 1rem;
+      }
+      .markdown {
+        margin: 0.5rem;
+        display: inline-block;
+        padding: 1rem;
+        width: 90%;
+        height: 600px;
+        max-height: 600px;
+        overflow-y: scroll;
+        border: 1px solid #969696;
+      }
+    </style>
+</head>
+<body>
+<h3>Spagheditor - Throw everything at the wall and see what sticks</h3>
+<textarea class="markdown">
+	
+</textarea>
+<br />
+<button class="parse">Parse</button>
+
+<script>
+
+document.querySelector('.markdown').value = `A **bold stuff** B **some more** C
+
+_Starts with Italics_ rest is loose goose
+
+Starts loose goose _ends with italics_ and **some bold**
+
+And *now let us try some __nesting__*
+
+And __the other kind of *nesting*__
+
+_**This** will be interesting_
+`;
+
+// document.querySelector('.markdown').value = `# Markdown syntax guide
+
+// ## Headers
+
+// # This is a Heading h1
+// ## This is a Heading h2 
+// ###### This is a Heading h6
+
+// ## Emphasis
+
+// *This text will be italic*  
+// _This will also be italic_
+
+// **This text will be bold**  
+// __This will also be bold__
+
+// _You **can** combine them_
+
+// ## Lists
+
+// ### Unordered
+
+// * Item 1
+// * Item 2
+// * Item 2a
+// * Item 2b
+
+// ### Ordered
+
+// 1. Item 1
+// 1. Item 2
+// 1. Item 3
+//   1. Item 3a
+//   1. Item 3b
+
+// ## Images
+
+// ![This is a alt text.](/image/sample.png "This is a sample image.")
+
+// ## Links
+
+// You may be using [Markdown Live Preview](https://markdownlivepreview.com/).
+
+// ## Blockquotes
+
+// > Markdown is a lightweight markup language with plain-text-formatting syntax, created in 2004 by John Gruber with Aaron Swartz.
+// >
+// >> Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.
+
+// ## Tables
+
+// | Left columns  | Right columns |
+// | ------------- |:-------------:|
+// | left foo      | right foo     |
+// | left bar      | right bar     |
+// | left baz      | right baz     |
+
+// ## Blocks of code
+
+// \`\`\`
+// let message = 'Hello world';
+// alert(message);
+// \`\`\`
+
+// ## Inline code
+
+// This web site is using \`markedjs/marked\`.
+// `;
+
+class clsNoodle
+{
+    constructor()
+    {
+        this.elementType = '';
+        this.value = ''; //strings, 64bit encoded string for images
+        this.attributes = [];
+        // this.alt = '';
+        this.subElements = []; //array of boiler
+        // this.junkDrawer = []; //Unparsed attributes
+    }
+}
+
+const WHOLE_LINE_FMT = {
+	'h1': /^#{1} /,
+	'h2': /^#{2} /,
+	'h3': /^#{3} /,
+	'h4': /^#{4} /,
+	'h5': /^#{5} /,
+	'h6': /^#{6} /,
+	'blockquote': /^>( ){0,4}/,
+	'ul_li': /^(\+|\-|\*) +/, // TODO: counting and recording indentation may be necessary
+	'ol_li': /^[0-9]*\. +/  // TODO: counting and recording indentation may be necessary
+};
+
+const WITHIN_LINE_FMT = [
+	{ //image
+		patterns: [
+			/!\[(.*?)\]\((.*?)\)/
+		],
+		func: function(match) {
+			let noodle = new clsNoodle();
+			noodle.elementType = 'img';
+			noodle.attributes = {'alt': 'WHATEVER', 'src': 'WHATEVER', 'title': 'WHATEVER'};
+			return noodle;
+		}
+	},
+	{ //italic
+		patterns: [
+			/(?<!\*)\*(?!(\*| ))(.+?)(?<! )(?<!\*)\*(?!\*)/g,
+			/(?<!_)_(?!(_| ))(.+?)(?<! )(?<!_)_(?!_)/g
+		],
+		func: function(match) {
+			let noodle = new clsNoodle();
+			noodle.elementType = 'em';
+			noodle.value = match[2];
+			return boil(noodle);
+		}
+	},
+	{ //bold
+		patterns: [
+			/(?<!\*)\*\*(?!(\*| ))(.+?)(?<! )(?<!\*)\*\*(?!\*)/g,
+			/(?<!_)__(?!(_| ))(.+?)(?<! )(?<!_)__(?!_)/g,
+		],
+		func: function(match) {
+			let noodle = new clsNoodle();
+			noodle.elementType = 'strong';
+			noodle.value = match[2];
+			return boil(noodle);
+		}
+	}
+];
+
+function boil(noodle,root=false) { //Format single line
+
+	let text = noodle.value;
+
+	// 1. MD reads multiple spaces as one space, EXCEPT for in a code block
+	text = text.replaceAll(/ {1,}/g,' ');
+
+	// 2. Look for patterns
+	let allMatches = [];
+	let match;
+	for (const flavor of WITHIN_LINE_FMT) {
+		for (const pattern of flavor.patterns) {
+			while (match = pattern.exec(text)) {
+				match.func = flavor.func;
+				allMatches.push(match);
+			}
+		}
+	}
+
+	if (allMatches.length) {
+		noodle.value = '';
+
+		// 3. Hold off on matches that intersect with others
+		let matches = [];
+		let lastIdx = 0;
+		allMatches.sort((m1,m2) => m1.index - m2.index);
+		allMatches.forEach(match => {
+			let start = match.index;
+			let end   = match.index + match[0].length;
+			if (start >= lastIdx) {
+				matches.push(match);
+				lastIdx = end;
+			}
+		});
+
+		// 4. Break down into noodles;
+		lastIdx = 0;
+		let match, preMatch, simpleNoodle;
+		while (true) {
+			match = matches.shift();
+			preMatch = text.substring(lastIdx, match ? match.index : Infinity);
+			if (preMatch) {
+				let simpleNoodle = new clsNoodle();
+				simpleNoodle.value = preMatch;
+				noodle.subElements.push(simpleNoodle);
+			}
+			if (match) {
+				noodle.subElements.push(match.func(match));
+				lastIdx = match.index + match[0].length;
+			} else {
+				break;
+			}
+		}
+		return noodle;
+
+	}
+
+	// 5. If we get here, it should be left as a plain text noodle
+	return noodle;
+
+}
+
+document.querySelector('.parse').addEventListener('click',function() {
+
+	let mdText = document.querySelector('.markdown').value;
+
+	let mdLines = mdText.split("\n");
+	let noodles = [], noodleGroup = null, noodleGroupEType, noodle, subNoodle;
+	let line = '';
+	let midCodeBlock = false;
+
+	for (var lineNum = 0; lineNum < mdLines.length; lineNum++) {
+
+		line = mdLines[lineNum];
+		line = line.replace('\t','    '); // a tab (in most cases unlikely to be noticed by md) is like 4 spaces.
+		
+		if (midCodeBlock) {
+
+			if (line.replace(/^ {4}/,'').startsWith('```')) {
+				noodles.push(noodle);
+				midCodeBlock = false;
+				continue;
+			} else {
+				subNoodle = new clsNoodle();
+				subNoodle.value = mdLines[lineNum];
+				noodle.subElements.push(subNoodle);
+				continue;
+			}
+			
+		}
+
+		if (!line.trim()) { //flavorless
+			continue;
+		}
+
+		noodle = new clsNoodle();
+
+		if (/^ {4}/.test(line)) { // A ONE-LINE CODE BLOCK
+			noodle.elementType = 'codeblock';
+			noodle.text = line.replace(/^ {4}/,'');
+			noodles.push(noodle);
+			continue;
+		}
+
+		line = line.replace(/^ */,'');
+
+		if (line.startsWith('```')) { // A MULTI-LINE CODE BLOCK
+			noodle.elementType = 'codeblock';
+			//at this point we must continue to add lines (without boiling) until we find a closing ```
+			midCodeBlock = true;
+			continue;
+		}
+
+		for (const [eType, pattern] of Object.entries(WHOLE_LINE_FMT)) {
+			if (pattern.test(line)) {
+				noodle.elementType = eType;
+				line = line.replace(pattern,'');
+				break;
+			}
+		}
+		if (!noodle.elementType) {
+			noodle.elementType = 'p';
+		}
+
+		noodle.value = line;
+		noodle = boil(noodle,true);
+
+		// Group noodles into certain types
+		if (['ol_li','ul_li'].includes(noodle.elementType)) {
+			noodleGroupEType = noodle.elementType.split('_')[0];
+			noodle.elementType = noodle.elementType.split('_')[1];
+		} else {
+			noodleGroupEType = null;
+		}
+
+		if (noodleGroup) { //either add noodle to the group (and continue loop) or close group
+			if (noodleGroupEType == noodleGroup.elementType) {
+				noodleGroup.subElements.push(noodle);
+				continue;
+			} else { //close group
+				noodles.push(noodleGroup);
+				noodleGroup = null;
+			}
+		}
+
+		if (noodleGroupEType) { //either create a new group or add to the root level
+			noodleGroup = new clsNoodle();
+			noodleGroup.elementType = noodleGroupEType;
+			noodleGroup.subElements.push(noodle);
+		} else {
+			noodles.push(noodle);
+		}
+
+	}
+
+	console.log(noodles);
+
+});
+
+</script>
+
+</body>
+</html>
