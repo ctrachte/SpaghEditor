@@ -73,6 +73,11 @@ function parseHtmlIn(html)
                 {
                     noodle.elementType = nd.nodeName.toString();
                     noodle.value = '';
+                    if(noodle.elementType === 'IMG')
+                    {
+                        let img = getImg64bitString(nd.getAttribute('src'));
+                        noodle.value = img;
+                    }
                     if(nd.attributes.length > 0)
                     {
                         for(let i=0; i < nd.attributes.length; i++)
@@ -92,6 +97,12 @@ function parseHtmlIn(html)
                                     else
                                     {
                                         noodle.attributes.push({name: nd.attributes[i].name, value: true});
+                                    }
+                                    break;
+                                case 'src':
+                                    if(noodle.elementType === 'img' && noodle.getAttribute('src').length > 0)
+                                    {
+                                        noodle.attributes.push({name: 'origsrc', value: nd.attributes[i].value});
                                     }
                                     break;
                                 default: 
@@ -128,6 +139,25 @@ function parseHtmlIn(html)
     return nodesArr;
 }
 
+function getImg64bitString(imgPath)
+{
+    var img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.src = imgPath;
+    //img.onload = () => { return ready};
+
+    let canvas = document.createElement('CANVAS');
+    let ctx = canvas.getContext('2d');
+    canvas.height = img.naturalHeight;
+    canvas.width = img.naturalWidth;
+    ctx.drawImage(img, 0, 0);
+
+    return setTimeout(() => 
+    {
+        return canvas.toDataURL();
+    }, 500);
+}
+
 /** Parses array of clsNoodle to HTML Elements **/
 function parseHtmlOut(obj)
 {
@@ -148,7 +178,15 @@ function parseHtmlOut(obj)
                     });
                 }
 
-                newEl.innerText = noodle.value;
+                if(noodle.elementType.toString() === 'IMG')
+                {
+                    console.log(noodle.value);
+                    newEl.src = noodle.value;
+                }
+                else
+                {
+                    newEl.innerText = noodle.value;
+                }
 
                 if(noodle.subElements.length > 0)
                 {
@@ -198,7 +236,8 @@ class clsNoodle
     }
 }
 
-    let testText = `The Egg
+    let testText = `<img src="./img/swedishchef.jpg">
+The Egg
 # SpaghEditor
 ## SpaghEditor
 ### SpaghEditor
