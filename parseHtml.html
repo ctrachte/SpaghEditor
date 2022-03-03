@@ -5,6 +5,9 @@
     <title>Spagheditor - Throw everything at the wall and see what sticks</title>
 </head>
 <body>
+    <button class="parseIn">Parse In</button>
+    <button class="parseOut">Parse Out</button>
+    <button class="updateDisplay">Update Display</button>
 <h3>Spagheditor - Throw everything at the wall and see what sticks</h3>
 <p>
     The master behind the scenes is the chef <br />
@@ -16,6 +19,21 @@
 </p>
 
 <script src="parseHtml.js"></script>
+<script>
+    let noodleObj,htmlObj;
+    document.querySelector('.parseIn').addEventListener('click', function()
+    {
+        noodleObj = parseHtmlIn(testText);
+    });
+    document.querySelector('.parseOut').addEventListener('click', function()
+    {
+        htmlObj = parseHtmlOut(noodleObj);
+    });
+    document.querySelector('.updateDisplay').addEventListener('click', function()
+    {
+        document.body.append(htmlObj)
+    });
 
+</script>
 </body>
 </html>
