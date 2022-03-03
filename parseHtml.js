@@ -75,8 +75,12 @@ function parseHtmlIn(html)
                     noodle.value = '';
                     if(noodle.elementType === 'IMG')
                     {
-                        let img = getImg64bitString(nd.getAttribute('src'));
-                        noodle.value = img;
+                        let img = getImg64bitString(nd.getAttribute('src'))
+                        .then(data =>
+                        {
+                            noodle.value = img;
+                            console.log(img);
+                        });
                     }
                     if(nd.attributes.length > 0)
                     {
@@ -139,23 +143,21 @@ function parseHtmlIn(html)
     return nodesArr;
 }
 
-function getImg64bitString(imgPath)
+async function getImg64bitString(imgPath)
 {
-    var img = new Image();
-    img.crossOrigin = 'Anonymous';
-    img.src = imgPath;
-    //img.onload = () => { return ready};
-
     let canvas = document.createElement('CANVAS');
     let ctx = canvas.getContext('2d');
-    canvas.height = img.naturalHeight;
-    canvas.width = img.naturalWidth;
-    ctx.drawImage(img, 0, 0);
-
-    return setTimeout(() => 
+    let img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.src = imgPath;
+    let data;
+    await img.addEventListener('load', async () =>
     {
-        return canvas.toDataURL();
-    }, 500);
+        canvas.height = img.naturalHeight;
+        canvas.width = img.naturalWidth;
+        ctx.drawImage(img, 0, 0);
+        data = await canvas.toDataURL();
+    });
 }
 
 /** Parses array of clsNoodle to HTML Elements **/
@@ -180,7 +182,6 @@ function parseHtmlOut(obj)
 
                 if(noodle.elementType.toString() === 'IMG')
                 {
-                    console.log(noodle.value);
                     newEl.src = noodle.value;
                 }
                 else
@@ -207,6 +208,7 @@ function parseHtmlOut(obj)
         }
         else
         {
+            console.log(obj);
             console.error('single object or other issue');
         }
     }
@@ -390,9 +392,9 @@ You thought for a long time.
 And I sent you on your way.`;
 
     let noodleObj = parseHtmlIn(testText);
-    console.log(noodleObj);
+    //console.log(noodleObj);
 
     let htmlObj = parseHtmlOut(noodleObj);
-    console.log(htmlObj);
+    //console.log(htmlObj);
 
     document.body.append(htmlObj)
