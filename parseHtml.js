@@ -6,6 +6,56 @@ class parse
         this.noodlesArr = [];
 
         //Run ParseHTMLIn and inside of ParseHTMLIn run parseMDIn
+
+        this.MD_WHOLE_LINE_FMT = {
+			'h1': /^#{1} /,
+			'h2': /^#{2} /,
+			'h3': /^#{3} /,
+			'h4': /^#{4} /,
+			'h5': /^#{5} /,
+			'h6': /^#{6} /,
+			'blockquote': /^>( ){0,4}/,
+			'ul_li': /^(\+|\-|\*) +/, // TODO: counting and recording indentation may be necessary
+			'ol_li': /^[0-9]*\. +/  // TODO: counting and recording indentation may be necessary
+		};
+
+		this.MD_WITHIN_LINE_FMT = [
+			{ //image
+				patterns: [
+					/!\[(.*?)\]\((.*?)\)/
+				],
+				func: function(match) {
+					let noodle = new clsNoodle();
+					noodle.elementType = 'img';
+					noodle.attributes = {'alt': 'WHATEVER', 'src': 'WHATEVER', 'title': 'WHATEVER'};
+					return noodle;
+				}
+			},
+			{ //italic
+				patterns: [
+					/(?<!\*)\*(?!(\*| ))(.+?)(?<! )(?<!\*)\*(?!\*)/g,
+					/(?<!_)_(?!(_| ))(.+?)(?<! )(?<!_)_(?!_)/g
+				],
+				func: function(match) {
+					let noodle = new clsNoodle();
+					noodle.elementType = 'em';
+					noodle.value = match[2];
+					return boil(noodle);
+				}
+			},
+			{ //bold
+				patterns: [
+					/(?<!\*)\*\*(?!(\*| ))(.+?)(?<! )(?<!\*)\*\*(?!\*)/g,
+					/(?<!_)__(?!(_| ))(.+?)(?<! )(?<!_)__(?!_)/g,
+				],
+				func: function(match) {
+					let noodle = new clsNoodle();
+					noodle.elementType = 'strong';
+					noodle.value = match[2];
+					return boil(noodle);
+				}
+			}
+		];
     }
 
     exportJSON()
@@ -165,6 +215,11 @@ class parse
 
     }
 
+    parseMDInHandler(md)
+    {
+
+    }
+
     /** Parses array of clsNoodle to HTML Elements **/
     parseHTMLOut(obj)
     {
@@ -230,7 +285,12 @@ class parse
         return newHtml;
     }
 
-    parseMarkDownOut()
+    parseMDOut()
+    {
+
+    }
+
+    parseJSONOut()
     {
         return JSON.stringify(this.noodlesArr);
     }
