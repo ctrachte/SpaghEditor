@@ -21,13 +21,14 @@
 <script src="parseHtml.js"></script>
 <script>
     let noodleObj,htmlObj;
+    const newParse = new parse();
     document.querySelector('.parseIn').addEventListener('click', function()
     {
-        noodleObj = parseHtmlIn(testText);
+        noodleObj = newParse.parseHTMLIn(testText);
     });
     document.querySelector('.parseOut').addEventListener('click', function()
     {
-        htmlObj = parseHtmlOut(noodleObj);
+        htmlObj = newParse.parseHTMLOut(noodleObj);
     });
     document.querySelector('.updateDisplay').addEventListener('click', function()
     {
