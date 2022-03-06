@@ -1,5 +1,8 @@
 //Call plugins utensils
+//Collection of plugins/utensils is a kitchen drawer
 //Core class which plugins don't directly alter
+//Hooks for key actions where plugins might execute functions in array
+//What actions might take place during the parse or inside of the json before parse?
 class chef
 {
     constructor(options)

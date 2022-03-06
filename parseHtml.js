@@ -3,9 +3,22 @@ class parse
     constructor()
     {
 
+        this.noodlesArr = [];
+
+        //Run ParseHTMLIn and inside of ParseHTMLIn run parseMDIn
+    }
+
+    exportJSON()
+    {
+
     }
 
     parseHTMLIn(html)
+    {
+        this.noodlesArr = this.parseHTMLInHandler(html);
+    }
+
+    parseHTMLInHandler(html)
     {
         let parser = new DOMParser();
         let htmlDoc;
@@ -147,7 +160,7 @@ class parse
         return nodesArr;
     }
 
-    parseMarkDownIn(md)
+    parseMDIn(md)
     {
 
     }
@@ -156,6 +169,7 @@ class parse
     parseHTMLOut(obj)
     {
         let newHtml = document.createElement('div');
+
         if(typeof obj === 'object')
         {
             if(obj.length > 1)
@@ -185,6 +199,10 @@ class parse
                     {
                         noodle.subElements.forEach((subEl) =>
                         {
+                            if(typeof subEl === 'undefined')
+                            {
+                                return;
+                            }
                             let children = this.parseHTMLOut(subEl);
                             children = children.childNodes; //Delivered back in DIV but we don't need that
 

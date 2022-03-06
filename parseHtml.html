@@ -24,11 +24,13 @@
     const newParse = new parse();
     document.querySelector('.parseIn').addEventListener('click', function()
     {
-        noodleObj = newParse.parseHTMLIn(testText);
+        newParse.parseHTMLIn(testText);
+
+        //Needs time inbetween parse in and parse out to properly capture images
     });
     document.querySelector('.parseOut').addEventListener('click', function()
     {
-        htmlObj = newParse.parseHTMLOut(noodleObj);
+        htmlObj = newParse.parseHTMLOut(newParse.noodlesArr);
     });
     document.querySelector('.updateDisplay').addEventListener('click', function()
     {
