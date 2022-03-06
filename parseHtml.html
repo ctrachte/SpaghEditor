@@ -8,6 +8,7 @@
     <button class="parseIn">Parse In</button>
     <button class="parseOut">Parse Out</button>
     <button class="updateDisplay">Update Display</button>
+    <button class="ExportJSON">Export JSON</button>
 <h3>Spagheditor - Throw everything at the wall and see what sticks</h3>
 <p>
     The master behind the scenes is the chef <br />
@@ -34,7 +35,11 @@
     });
     document.querySelector('.updateDisplay').addEventListener('click', function()
     {
-        document.body.append(htmlObj)
+        document.body.append(htmlObj);
+    });
+    document.querySelector('.ExportJSON').addEventListener('click', function()
+    {
+        console.log(newParse.parseMarkDownOut());
     });
 
 </script>

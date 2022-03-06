@@ -232,7 +232,7 @@ class parse
 
     parseMarkDownOut()
     {
-
+        return JSON.stringify(this.noodlesArr);
     }
 
     async getImg64bitString(imgPath, callback)
