@@ -58,11 +58,6 @@ class parse
 		];
     }
 
-    exportJSON()
-    {
-
-    }
-
     parseHTMLIn(html)
     {
         this.noodlesArr = this.parseHTMLInHandler(html);
@@ -285,7 +280,7 @@ class parse
         return newHtml;
     }
 
-    parseMDOut()
+    parseMDOut(obj)
     {
 
     }
