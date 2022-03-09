@@ -1,5 +1,6 @@
 export default class Possum {
   // TODO: trap should be like a hashing key? implement hashing
+  // TODO: chars " and ' are not being translated back correctly
   constructor(spaghetti, bait, trap) {
     this.spaghetti = spaghetti;
     this.bait = bait; // salt

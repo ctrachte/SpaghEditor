@@ -78,7 +78,7 @@
     </style>
     <script type="module">
       import Chef from './Chef.js'
-      import Possum from './spaghetify.js'
+      import Possum from './possum.js'
       let testText = `The Egg
 
 By: Andy Weir
@@ -249,7 +249,7 @@ And I sent you on your way.`
       //   outputElement: document.getElementById('previewView'),
       // }
       // let GordonRamsay = new Chef(options);
-      let possum = new Possum( document.getElementById('editor').innerHTML || "testText", "salt", "hash");
+      let possum = new Possum( document.getElementById('editor').innerHTML || testText, "salt", "hash");
 
       }
       const processButton = document.getElementById('processButton')
