@@ -122,6 +122,7 @@ export default class Possum {
         )
       ))
     }
-    console.log("decrypted:", decrypted)
+    context.final = decrypted.join("\n");
+    console.log("Decrypted, rejoined final product", context.final)
   }
 }
