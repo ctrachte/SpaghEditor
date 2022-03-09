@@ -81,9 +81,6 @@ export default class Possum {
     // and the privateKey will be used to decrypt.
     // Note: This will generate new keys each time, you must store both of them in order for
     // you to keep encrypting and decrypting.
-    //
-    // I warn you that storing them in the localStorage may be a bad idea, and it gets out of the scope
-    // of this post.
     context.key = await crypto.subtle.generateKey(
       {
         name: "RSA-OAEP",
@@ -92,9 +89,8 @@ export default class Possum {
         hash: { name: "SHA-512" },
       },
       true,
-      // This depends a lot on the algorithm used
-      // Look down below https://auth0.com/docs/protocols/oauth2/redirect-users
-      // and see the table. Since we're using RSA-OAEP we have encrypt and decrypt
+      // https://auth0.com/docs/protocols/oauth2/redirect-users
+      // Since we're using RSA-OAEP we have encrypt and decrypt
       // available
       ["encrypt", "decrypt"]
     );
