@@ -93,11 +93,10 @@ export default class Possum {
       // available
       ["encrypt", "decrypt"]
     );
-    console.log(context.key);
+    // console.log(context.key);
     let encrypted = [];
     let decrypted = [];
     const stringToEncrypt = string || context.spaghetti;
-    console.log("raw:", stringToEncrypt);
     context.array = stringToEncrypt.split(/\r?\n/);
     //encrypt all
     for (let i = 0, strLen = context.array.length; i < strLen; i++) {
@@ -109,7 +108,6 @@ export default class Possum {
         context.stringToArrayBuffer(context.array[i])
       ))
     }      
-    console.log("encrypted:", encrypted)
     //decrypt all
     for (let i = 0, strLen = encrypted.length; i < strLen; i++) {
       decrypted.push(context.arrayBufferToString(
@@ -123,6 +121,12 @@ export default class Possum {
       ))
     }
     context.final = decrypted.join("\n");
+    context.mess = encrypted;
+    context.cleaned = decrypted;
+
+    console.log("raw:", context.spaghetti);
+    console.log("encrypted:", context.mess);
+    console.log("decrypted:", context.cleaned)
     console.log("Decrypted, rejoined final product", context.final)
   }
 }
