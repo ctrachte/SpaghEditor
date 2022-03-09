@@ -12,23 +12,15 @@ export default class Possum {
     this.mess = this.destroy();
     // janitor cleans up the mess
     this.clean = this.janitor();
-    console.log(
-      "original input:",
-      spaghetti,
-      "mess:",
-      this.mess,
-      "Janitor:",
-      this.clean
-    );
+    // console.log(
+    //   "original input:",
+    //   spaghetti,
+    //   "mess:",
+    //   this.mess,
+    //   "Janitor:",
+    //   this.clean
+    // );
   }
-  makeMess = (spaghetti) =>
-    spaghetti.split("").map((noodle) => noodle.codePointAt(0));
-  takeByte = (noodle) =>
-    ("0" + Number(noodle).toString(16)).substring(
-      ("0" + Number(noodle).toString(16)).length - 2,
-      ("0" + Number(noodle).toString(16)).length
-    );
-  takeBait = (mess) => this.makeMess(this.bait).reduce((a, b) => a ^ b, mess);
   destroy = () =>
     this.spaghetti
       .split("")
@@ -39,8 +31,27 @@ export default class Possum {
   janitor = () =>
     this.mess
       .match(/.{1,2}/g)
-      .map((scoop) => parseInt(scoop, 16))
+      .map(this.mop)
       .map(this.takeBait)
-      .map((noodle) => String.fromCodePoint(noodle))
+      .map(this.reorganize)
       .join("");
+  makeMess = (spaghetti) =>
+    spaghetti.split("").map((noodle) => noodle.codePointAt(0));
+  takeByte = (noodle) => {
+    let number = "0" + Number(noodle).toString(16);
+    // console.log(number);
+    return number.substring(
+      ("0" + Number(noodle).toString(16)).length - 2,
+      ("0" + Number(noodle).toString(16)).length
+    );
+  };
+  takeBait = (mess) => this.makeMess(this.bait).reduce((a, b) => a ^ b, mess);
+  mop = (pile) => {
+    // console.log(pile);
+    return parseInt(pile, 16);
+  };
+  reorganize = (mess) => {
+    // console.log(mess);
+    return String.fromCodePoint("0" + mess);
+  };
 }
