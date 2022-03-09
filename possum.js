@@ -60,7 +60,7 @@ export default class Possum {
   codepoint(string) {
     // console.log(string, string.codePointAt(0))
     return string.codePointAt(0);
-  };
+  }
   stringToArrayBuffer(str) {
     const buff = new ArrayBuffer(str.length * 2); // Because there are 2 bytes for each char.
     const buffView = new Uint16Array(buff);
@@ -68,19 +68,18 @@ export default class Possum {
       buffView[i] = str.codePointAt(i);
     }
     return buff;
-  };
+  }
   arrayBufferToString(buff) {
     return String.fromCodePoint.apply(null, new Uint16Array(buff));
-  };
+  }
   async generateKey(string) {
     let context = this;
-    const stringToEncrypt = string || context.spaghetti;
-    console.log(stringToEncrypt)
     // https://github.com/diafygi/webcrypto-examples#rsa-oaep---generatekey
     // The resultant publicKey will be used to encrypt
     // and the privateKey will be used to decrypt.
     // Note: This will generate new keys each time, you must store both of them in order for
     // you to keep encrypting and decrypting.
+    // key will yield a key.publicKey and key.privateKey property.
     context.key = await crypto.subtle.generateKey(
       {
         name: "RSA-OAEP",
@@ -94,25 +93,35 @@ export default class Possum {
       // available
       ["encrypt", "decrypt"]
     );
-    console.log(context.key)
-
-    // key will yield a key.publicKey and key.privateKey property.
-
-    context.encryptedUri = await crypto.subtle.encrypt(
-      {
-        name: "RSA-OAEP",
-      },
-      context.key.publicKey,
-      context.stringToArrayBuffer(stringToEncrypt)
-    );
-    console.log("encrypted:", context.arrayBufferToString(context.encryptedUri))
-    context.msg = await crypto.subtle.decrypt(
-      {
-        name: "RSA-OAEP",
-      },
-      context.key.privateKey,
-      context.encryptedUri
-    );
-    console.log('decrypted', context.arrayBufferToString(context.msg))
-  };
+    console.log(context.key);
+    let encrypted = [];
+    let decrypted = [];
+    const stringToEncrypt = string || context.spaghetti;
+    console.log("raw:", stringToEncrypt);
+    context.array = stringToEncrypt.split(/\r?\n/);
+    //encrypt all
+    for (let i = 0, strLen = context.array.length; i < strLen; i++) {
+      encrypted.push(await crypto.subtle.encrypt(
+        {
+          name: "RSA-OAEP",
+        },
+        context.key.publicKey,
+        context.stringToArrayBuffer(context.array[i])
+      ))
+    }      
+    console.log("encrypted:", encrypted)
+    //decrypt all
+    for (let i = 0, strLen = encrypted.length; i < strLen; i++) {
+      decrypted.push(context.arrayBufferToString(
+        await crypto.subtle.decrypt(
+          {
+            name: "RSA-OAEP",
+          },
+          context.key.privateKey,
+          encrypted[i]
+        )
+      ))
+    }
+    console.log("decrypted:", decrypted)
+  }
 }
