@@ -1,63 +1,39 @@
-const cipher = salt => {
-    const textToChars = text => text.split('').map(c => c.charCodeAt(0));
-    const byteHex = n => ("0" + Number(n).toString(16)).substr(-2);
-    const applySaltToChar = code => textToChars(salt).reduce((a,b) => a ^ b, code);
-
-    return text => text.split('')
-      .map(textToChars)
-      .map(applySaltToChar)
-      .map(byteHex)
-      .join('');
-}
-    
-const decipher = salt => {
-    const textToChars = text => text.split('').map(c => c.charCodeAt(0));
-    const applySaltToChar = code => textToChars(salt).reduce((a,b) => a ^ b, code);
-    return encoded => encoded.match(/.{1,2}/g)
-      .map(hex => parseInt(hex, 16))
-      .map(applySaltToChar)
-      .map(charCode => String.fromCharCode(charCode))
-      .join('');
-}
-
-// To create a cipher
-const myCipher = cipher('mySecretSalt')
-
-//Then cipher any text:
-console.log(myCipher('the secret string'))
-
-//To decipher, you need to create a decipher and use it:
-const myDecipher = decipher('mySecretSalt')
-console.log(myDecipher("7c606d287b6d6b7a6d7c287b7c7a61666f"))
-
-const crypt = (salt, text) => {
-    const textToChars = (text) => text.split("").map((c) => c.charCodeAt(0));
-    const byteHex = (n) => ("0" + Number(n).toString(16)).substr(-2);
-    const applySaltToChar = (code) => textToChars(salt).reduce((a, b) => a ^ b, code);
-  
-    return text
+export default class Possum {
+  constructor(spaghetti, bait, trap) {
+    this.spaghetti = spaghetti;
+    this.bait = bait; // salt
+    this.trap = trap; // hash key
+    this.destroy = this.destroy.bind(this);
+    this.cleanUp = this.cleanUp.bind(this);
+    this.makeMess = this.makeMess.bind(this);
+    this.takeBait = this.takeBait.bind(this);
+    // Possum destroys the spagetti
+    this.mess = destroy("salt", "Hello"); // -> 426f666665
+    // chef cleans up the mess
+    this.cleanUp = cleanUp("salt", "426f666665"); // -> Hello
+    console.log("mess:", this.mess, "cleanUp", this.cleanUp);
+  }
+  makeMess(spaghetti) {
+    spaghetti.split("").map((noodle) => noodle.charCodeAt(0));
+  }
+  takeByte = (noodle) => ("0" + Number(noodle).toString(16)).substring(-2);
+  takeBait(bait) {
+    this.makeMess(bait).reduce((a, b) => a ^ b, bait);
+  }
+  destroy() {
+    return this.spaghetti
       .split("")
-      .map(textToChars)
-      .map(applySaltToChar)
-      .map(byteHex)
+      .map(this.makeMess)
+      .map(this.takeBait)
+      .map(this.takeByte)
       .join("");
-  };
-  
-  const decrypt = (salt, encoded) => {
-    const textToChars = (text) => text.split("").map((c) => c.charCodeAt(0));
-    const applySaltToChar = (code) => textToChars(salt).reduce((a, b) => a ^ b, code);
-    return encoded
+  }
+  cleanUp() {
+    return this.spaghetti
       .match(/.{1,2}/g)
       .map((hex) => parseInt(hex, 16))
-      .map(applySaltToChar)
+      .map(this.takeBait)
       .map((charCode) => String.fromCharCode(charCode))
       .join("");
-  };
-
-  // encrypting
-const encrypted_text = crypt("salt", "Hello"); // -> 426f666665
-
-// decrypting
-const decrypted_string = decrypt("salt", "426f666665"); // -> Hello
-
-console.log('encrypt:', encrypted_text, 'decrypt', decrypted_string)
+  }
+}
