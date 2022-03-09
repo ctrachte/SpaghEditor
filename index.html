@@ -78,6 +78,7 @@
     </style>
     <script type="module">
       import Chef from './Chef.js'
+      import Possum from './spaghetify.js'
       let testText = `The Egg
 
 By: Andy Weir
@@ -242,12 +243,14 @@ And I sent you on your way.`
 
       const process = function () {""
       document.getElementById('previewView').innerHTML = "";
-      let options = {
-        text: document.getElementById('editor').innerHTML || testText,
-        raw: document.getElementById('rawText').value || testMarkdown,
-        outputElement: document.getElementById('previewView'),
-      }
-      let GordonRamsay = new Chef(options)
+      // let options = {
+      //   text: document.getElementById('editor').innerHTML || testText,
+      //   raw: document.getElementById('rawText').value || testMarkdown,
+      //   outputElement: document.getElementById('previewView'),
+      // }
+      // let GordonRamsay = new Chef(options);
+      let possum = new Possum( document.getElementById('editor').innerHTML || "testText", "salt", "hash");
+
       }
       const processButton = document.getElementById('processButton')
       processButton.addEventListener('click', process)
