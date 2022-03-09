@@ -1,4 +1,5 @@
 export default class Possum {
+    // TODO: trap should be like a hashing key? implement hashing
   constructor(spaghetti, bait, trap) {
     this.spaghetti = spaghetti;
     this.bait = bait; // salt
