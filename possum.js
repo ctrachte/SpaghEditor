@@ -22,7 +22,7 @@ export default class Possum {
     );
   }
   makeMess = (spaghetti) =>
-    spaghetti.split("").map((noodle) => noodle.charCodeAt(0));
+    spaghetti.split("").map((noodle) => noodle.codePointAt(0));
   takeByte = (noodle) =>
     ("0" + Number(noodle).toString(16)).substring(
       ("0" + Number(noodle).toString(16)).length - 2,
@@ -41,6 +41,6 @@ export default class Possum {
       .match(/.{1,2}/g)
       .map((scoop) => parseInt(scoop, 16))
       .map(this.takeBait)
-      .map((noodle) => String.fromCharCode(noodle))
+      .map((noodle) => String.fromCodePoint(noodle))
       .join("");
 }
