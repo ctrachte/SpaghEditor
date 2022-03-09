@@ -91,7 +91,7 @@ let three =
     {
         console.log('three');
     }
-}
+};
 
 let four =
 {
@@ -103,7 +103,7 @@ let four =
     {
         console.log("I'm plugin number 4");
     }
-}
+};
 
 let spag = new chef(
     {

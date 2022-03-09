@@ -188,6 +188,7 @@ class parse
                     console.error('attribute node')
                     break;
                 case 3: //text node
+                    //This is where eval (brain) and Markdown is evaluated 
                     noodle.elementType = 'P';
                     noodle.value = nd.textContent;
                     nodesArr.push(noodle);
