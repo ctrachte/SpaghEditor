@@ -5,10 +5,11 @@
     <title>Spagheditor - Throw everything at the wall and see what sticks</title>
 </head>
 <body>
-    <button class="parseIn">Parse In</button>
-    <button class="parseOut">Parse Out</button>
+    <button class="parseIn">Parse HTML In</button>
+    <button class="parseOut">Parse HTML Out</button>
     <button class="updateDisplay">Update Display</button>
     <button class="ExportJSON">Export JSON</button>
+    <button class="parseMDIn">Parse MD In</button>
 <h3>Spagheditor - Throw everything at the wall and see what sticks</h3>
 <p>
     The master behind the scenes is the chef <br />
@@ -40,6 +41,11 @@
     document.querySelector('.ExportJSON').addEventListener('click', function()
     {
         console.log(newParse.parseJSONOut());
+    });
+
+    document.querySelector('.parseMDIn').addEventListener('click', () =>
+    {
+        newParse.parseMDIn(testMD);
     });
 
 </script>

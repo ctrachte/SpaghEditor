@@ -6,61 +6,12 @@ class parse
         this.noodlesArr = [];
 
         //Run ParseHTMLIn and inside of ParseHTMLIn run parseMDIn
-
-        this.MD_WHOLE_LINE_FMT = {
-			'h1': /^#{1} /,
-			'h2': /^#{2} /,
-			'h3': /^#{3} /,
-			'h4': /^#{4} /,
-			'h5': /^#{5} /,
-			'h6': /^#{6} /,
-			'blockquote': /^>( ){0,4}/,
-			'ul_li': /^(\+|\-|\*) +/, // TODO: counting and recording indentation may be necessary
-			'ol_li': /^[0-9]*\. +/  // TODO: counting and recording indentation may be necessary
-		};
-
-		this.MD_WITHIN_LINE_FMT = [
-			{ //image
-				patterns: [
-					/!\[(.*?)\]\((.*?)\)/
-				],
-				func: function(match) {
-					let noodle = new clsNoodle();
-					noodle.elementType = 'img';
-					noodle.attributes = {'alt': 'WHATEVER', 'src': 'WHATEVER', 'title': 'WHATEVER'};
-					return noodle;
-				}
-			},
-			{ //italic
-				patterns: [
-					/(?<!\*)\*(?!(\*| ))(.+?)(?<! )(?<!\*)\*(?!\*)/g,
-					/(?<!_)_(?!(_| ))(.+?)(?<! )(?<!_)_(?!_)/g
-				],
-				func: function(match) {
-					let noodle = new clsNoodle();
-					noodle.elementType = 'em';
-					noodle.value = match[2];
-					return boil(noodle);
-				}
-			},
-			{ //bold
-				patterns: [
-					/(?<!\*)\*\*(?!(\*| ))(.+?)(?<! )(?<!\*)\*\*(?!\*)/g,
-					/(?<!_)__(?!(_| ))(.+?)(?<! )(?<!_)__(?!_)/g,
-				],
-				func: function(match) {
-					let noodle = new clsNoodle();
-					noodle.elementType = 'strong';
-					noodle.value = match[2];
-					return boil(noodle);
-				}
-			}
-		];
     }
 
     parseHTMLIn(html)
     {
         this.noodlesArr = this.parseHTMLInHandler(html);
+        console.log(this.noodlesArr);
     }
 
     parseHTMLInHandler(html)
@@ -208,12 +159,63 @@ class parse
 
     parseMDIn(md)
     {
-
+        this.noodlesArr = this.parseMDInHandler(md);
+        console.log(this.noodlesArr);
     }
 
     parseMDInHandler(md)
     {
+        let lineArr = md.split('\n');
+        let nodesArr = [];
 
+        const WHOLE_LINE_FMT = {
+			'h1': /^#{1} /,
+			'h2': /^#{2} /,
+			'h3': /^#{3} /,
+			'h4': /^#{4} /,
+			'h5': /^#{5} /,
+			'h6': /^#{6} /,
+			'blockquote': /^>( ){0,4}/,
+			'ul_li': /^(\+|\-|\*) +/, // TODO: counting and recording indentation may be necessary
+			'ol_li': /^[0-9]*\. +/  // TODO: counting and recording indentation may be necessary
+		};
+
+        lineArr.forEach((line) =>
+        {
+            let noodle = new clsNoodle();
+
+            Object.entries(WHOLE_LINE_FMT).forEach((frmt) =>
+            {
+                if(frmt[1].test(line))
+                {
+                    noodle.value = line.replace(frmt[1], '');
+                    noodle.elementType = frmt[0];
+                    nodesArr.push(noodle);
+                }
+            });
+            if(!noodle.elementType)
+            {
+                noodle.value = line;
+                noodle.elementType = 'P';
+                nodesArr.push(noodle);
+            }
+        });
+
+        return nodesArr;
+    }
+
+    parseMDInHandlerSub(md)
+    {
+        const WITHIN_LINE_FMT = {
+            //image
+            'IMG': /!\[(.*?)\]\((.*?)\)/,
+            //italic
+            'I': /(?<!\*)\*(?!(\*| ))(.+?)(?<! )(?<!\*)\*(?!\*)/g,
+            'I': /(?<!_)_(?!(_| ))(.+?)(?<! )(?<!_)_(?!_)/g,
+            //bold
+            'B': /(?<!\*)\*\*(?!(\*| ))(.+?)(?<! )(?<!\*)\*\*(?!\*)/g,
+            'B': /(?<!_)__(?!(_| ))(.+?)(?<! )(?<!_)__(?!_)/g,
+        };
     }
 
     /** Parses array of clsNoodle to HTML Elements **/
@@ -337,7 +339,7 @@ class clsNoodle
     }
 }
 
-    let testText = `<img src="./img/swedishchef.jpg">
+    let testText = `
 The Egg
 # SpaghEditor
 ## SpaghEditor
@@ -489,3 +491,39 @@ You thought for a long time.
 <!--“An egg.” <span>I answered.</span> “Now it’s time for you to move on to your next life.”-->
 
 And I sent you on your way.`;
+
+
+let testMD = `The Egg
+# SpaghEditor
+## SpaghEditor
+### SpaghEditor
+#### d
+##### dd
+###### d
+By: Andy Weir
+
+This is a paragraph
+
+I just love **bold text**.
+
+I just love __bold text__.
+
+Italicized text is the *cat's meow*.
+
+Italicized text is the _cat's meow_.
+
+This text is ***really important***.
+
+This text is ___really important___.
+
+This text is __*really important*__.
+
+This text is **_really important_**.
+
+> Dorothy followed her through many of the beautiful rooms in her castle.
+
+> Dorothy followed her through many of the beautiful rooms in her castle.
+>
+>> The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.
+
+`
